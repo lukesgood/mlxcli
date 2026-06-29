@@ -1,0 +1,20 @@
+{
+  "id": "PHizvzw6",
+  "created_at": "2026-06-29T18:14:56.739092",
+  "updated_at": "2026-06-29T18:14:56.739092",
+  "model": "test-model",
+  "working_directory": "/private/var/folders/zg/r1xpyw0x7wz73wdwcb344n840000gn/T/tmpiuk15mks",
+  "messages": [],
+  "context": {
+    "project_root": "/private/var/folders/zg/r1xpyw0x7wz73wdwcb344n840000gn/T/tmpiuk15mks",
+    "project_type": "unknown",
+    "file_tree": "",
+    "metadata": {
+      "top_level_files": [],
+      "readme_excerpt": null,
+      "project_type": "unknown",
+      "has_src": false,
+      "has_tests": false
+    }
+  }
+}

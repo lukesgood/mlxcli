@@ -1,0 +1,13 @@
+README.md
+pyproject.toml
+mlxcli/__init__.py
+mlxcli.egg-info/PKG-INFO
+mlxcli.egg-info/SOURCES.txt
+mlxcli.egg-info/dependency_links.txt
+mlxcli.egg-info/entry_points.txt
+mlxcli.egg-info/requires.txt
+mlxcli.egg-info/top_level.txt
+mlxcli/tools/__init__.py
+mlxcli/tools/base.py
+tests/test_base_tool.py
+tests/test_project_setup.py
