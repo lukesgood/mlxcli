@@ -167,7 +167,7 @@ class TestMLXBackendGenerate:
         backend.model = Mock()
         backend.tokenizer = Mock()
 
-        with patch("mlxcli.llm.generate", return_value="Generated text"):
+        with patch("mlxcli.backends.mlx_backend.generate", return_value="Generated text"):
             result = backend.generate("What is AI?")
 
         assert isinstance(result, str)
@@ -186,7 +186,7 @@ class TestMLXBackendGenerate:
         backend.model = Mock()
         backend.tokenizer = Mock()
 
-        with patch("mlxcli.llm.generate", return_value="Generated text"):
+        with patch("mlxcli.backends.mlx_backend.generate", return_value="Generated text"):
             result = backend.generate(
                 "What is AI?",
                 messages=[
@@ -206,7 +206,7 @@ class TestMLXBackendGenerate:
 
         tools = [{"name": "calculator", "description": "A calculator tool"}]
 
-        with patch("mlxcli.llm.generate", return_value="Generated text"):
+        with patch("mlxcli.backends.mlx_backend.generate", return_value="Generated text"):
             result = backend.generate("What is 2+2?", tools=tools)
 
         assert isinstance(result, str)
@@ -218,7 +218,7 @@ class TestMLXBackendGenerate:
         backend.model = Mock()
         backend.tokenizer = Mock()
 
-        with patch("mlxcli.llm.generate", return_value="Generated text"):
+        with patch("mlxcli.backends.mlx_backend.generate", return_value="Generated text"):
             result = backend.generate("What is AI?", max_tokens=256)
 
         assert isinstance(result, str)
@@ -230,7 +230,7 @@ class TestMLXBackendGenerate:
         backend.model = Mock()
         backend.tokenizer = Mock()
 
-        with patch("mlxcli.llm.generate", return_value="Generated text"):
+        with patch("mlxcli.backends.mlx_backend.generate", return_value="Generated text"):
             result = backend.generate("Test prompt")
 
         assert isinstance(result, str)
@@ -242,7 +242,7 @@ class TestMLXBackendGenerate:
         backend.model = Mock()
         backend.tokenizer = Mock()
 
-        with patch("mlxcli.llm.generate", return_value="Generated response"):
+        with patch("mlxcli.backends.mlx_backend.generate", return_value="Generated response"):
             result = backend.generate(
                 prompt="What is AI?",
                 messages=[{"role": "user", "content": "Hello"}],
@@ -376,7 +376,7 @@ class TestMLXBackendGracefulHandling:
 
     def test_backend_works_without_mlx_installed(self):
         """Backend should work gracefully even if MLX is not installed."""
-        with patch("mlxcli.llm.mlx_available", False):
+        with patch("mlxcli.backends.mlx_backend.mlx_available", False):
             backend = MLXBackend()
 
         # Should still be able to create instance
@@ -436,7 +436,7 @@ class TestMLXBackendIntegration:
         backend.current_model_name = "test-model"
 
         # Generate text
-        with patch("mlxcli.llm.generate", return_value="Generated text"):
+        with patch("mlxcli.backends.mlx_backend.generate", return_value="Generated text"):
             result = backend.generate("Test prompt")
         assert isinstance(result, str)
 
