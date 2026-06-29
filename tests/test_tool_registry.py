@@ -13,9 +13,7 @@ from mlxcli.tools.base import Tool
 class SimpleTool(Tool):
     """Simple test tool implementation."""
 
-    def __init__(
-        self, name: str = "simple_tool", description: str = "A simple test tool"
-    ):
+    def __init__(self, name: str = "simple_tool", description: str = "A simple test tool"):
         self._name = name
         self._description = description
 
@@ -178,10 +176,7 @@ class TestToolRegistryExecution:
         assert isinstance(result, dict)
         assert result["status"] == "error"
         assert "message" in result
-        assert (
-            "failed" in result["message"].lower()
-            or "execution" in result["message"].lower()
-        )
+        assert "failed" in result["message"].lower() or "execution" in result["message"].lower()
 
     def test_execute_passes_args_to_tool(self):
         """execute() should pass args dict to tool's execute method."""

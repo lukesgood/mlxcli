@@ -250,8 +250,7 @@ class TestTrimToBudget:
         """trim_to_budget should handle many long messages correctly."""
         manager = ContextManager()
         messages = [
-            {"role": "user", "content": "message " + str(i) + " " + "a" * 200}
-            for i in range(10)
+            {"role": "user", "content": "message " + str(i) + " " + "a" * 200} for i in range(10)
         ]
 
         result = manager.trim_to_budget(messages, token_budget=200)
@@ -293,9 +292,7 @@ class TestMultipleTrimOperations:
     def test_multiple_trim_operations_work_correctly(self):
         """Multiple trim operations should work consistently."""
         manager = ContextManager(max_tokens=1000)
-        messages = [
-            {"role": "user", "content": "a" * 100, "id": i} for i in range(5)
-        ]
+        messages = [{"role": "user", "content": "a" * 100, "id": i} for i in range(5)]
 
         result1 = manager.trim_to_budget(messages, token_budget=200)
         result2 = manager.trim_to_budget(messages, token_budget=200)
@@ -318,8 +315,7 @@ class TestMultipleTrimOperations:
         """Large conversation histories should trim properly."""
         manager = ContextManager()
         messages = [
-            {"role": "user" if i % 2 == 0 else "assistant", "content": "m" * 50}
-            for i in range(100)
+            {"role": "user" if i % 2 == 0 else "assistant", "content": "m" * 50} for i in range(100)
         ]
 
         result = manager.trim_to_budget(messages, token_budget=500)

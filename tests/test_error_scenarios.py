@@ -35,8 +35,7 @@ class TestModelNotFoundScenario:
 
             # Simulate model not found
             result = handler.handle_error(
-                "model_not_found",
-                {"model_name": "nonexistent-model-xyz"}
+                "model_not_found", {"model_name": "nonexistent-model-xyz"}
             )
 
             # Verify error handling
@@ -49,13 +48,13 @@ class TestModelNotFoundScenario:
         """Model not found error should include actionable recovery path."""
         handler = ErrorHandler()
 
-        result = handler.handle_error(
-            "model_not_found",
-            {"model_name": "meta-llama/Llama-2-7b"}
-        )
+        result = handler.handle_error("model_not_found", {"model_name": "meta-llama/Llama-2-7b"})
 
         # Verify recovery path exists
-        assert "download" in result["suggestion"].lower() or "list-models" in result["suggestion"].lower()
+        assert (
+            "download" in result["suggestion"].lower()
+            or "list-models" in result["suggestion"].lower()
+        )
         assert result["next_step"]
 
     def test_system_recovers_from_model_not_found(self):
@@ -130,10 +129,7 @@ class TestCorruptedSessionScenario:
 
         result = handler.handle_error(
             "session_corrupted",
-            {
-                "session_id": "corrupted_abc",
-                "error_detail": "JSON parse error at line 5"
-            }
+            {"session_id": "corrupted_abc", "error_detail": "JSON parse error at line 5"},
         )
 
         assert result["status"] == "handled"
@@ -149,11 +145,9 @@ class TestShellCommandSafetyScenario:
         """End-to-end: Dangerous rm -rf command blocked without confirmation."""
         tool = ShellTool()
 
-        result = tool.execute({
-            "action": "execute",
-            "command": "rm -rf /tmp/test_dangerous",
-            "confirmed": False
-        })
+        result = tool.execute(
+            {"action": "execute", "command": "rm -rf /tmp/test_dangerous", "confirmed": False}
+        )
 
         assert result["status"] == "blocked"
         assert "dangerous" in result["message"].lower()
@@ -168,11 +162,9 @@ class TestShellCommandSafetyScenario:
 
         try:
             # Execute with confirmation
-            result = tool.execute({
-                "action": "execute",
-                "command": f"rm {temp_file}",
-                "confirmed": True
-            })
+            result = tool.execute(
+                {"action": "execute", "command": f"rm {temp_file}", "confirmed": True}
+            )
 
             assert result["status"] == "ok"
         finally:
@@ -184,11 +176,9 @@ class TestShellCommandSafetyScenario:
         """Safe commands should execute without blocking."""
         tool = ShellTool()
 
-        result = tool.execute({
-            "action": "execute",
-            "command": "echo 'safe command'",
-            "confirmed": False
-        })
+        result = tool.execute(
+            {"action": "execute", "command": "echo 'safe command'", "confirmed": False}
+        )
 
         assert result["status"] == "ok"
         assert "safe command" in result["stdout"]
@@ -202,11 +192,7 @@ class TestTimeoutRecoveryScenario:
         handler = ErrorHandler()
 
         result = handler.handle_error(
-            "timeout",
-            {
-                "timeout_seconds": 30,
-                "operation": "model_inference"
-            }
+            "timeout", {"timeout_seconds": 30, "operation": "model_inference"}
         )
 
         assert result["status"] == "handled"
@@ -219,8 +205,7 @@ class TestTimeoutRecoveryScenario:
         handler = ErrorHandler()
 
         result = handler.handle_error(
-            "timeout",
-            {"timeout_seconds": 60, "operation": "context_trimming"}
+            "timeout", {"timeout_seconds": 60, "operation": "context_trimming"}
         )
 
         # Should suggest specific actions
@@ -236,17 +221,11 @@ class TestTimeoutRecoveryScenario:
             handler = ErrorHandler()
 
             # First timeout
-            result1 = handler.handle_error(
-                "timeout",
-                {"timeout_seconds": 30, "operation": "op1"}
-            )
+            result1 = handler.handle_error("timeout", {"timeout_seconds": 30, "operation": "op1"})
             assert result1["status"] == "handled"
 
             # System should still be responsive
-            result2 = handler.handle_error(
-                "timeout",
-                {"timeout_seconds": 30, "operation": "op2"}
-            )
+            result2 = handler.handle_error("timeout", {"timeout_seconds": 30, "operation": "op2"})
             assert result2["status"] == "handled"
 
 
@@ -257,30 +236,22 @@ class TestOutOfMemoryScenario:
         """End-to-end: OOM error suggests switching to smaller model."""
         handler = ErrorHandler()
 
-        result = handler.handle_error(
-            "oom",
-            {
-                "available_memory": "2GB",
-                "required_memory": "8GB"
-            }
-        )
+        result = handler.handle_error("oom", {"available_memory": "2GB", "required_memory": "8GB"})
 
         assert result["status"] == "handled"
         assert "memory" in result["error"].lower() or "out of memory" in result["error"].lower()
         suggestion_lower = result["suggestion"].lower()
-        assert "model" in suggestion_lower or "reduce" in suggestion_lower or "simplif" in suggestion_lower
+        assert (
+            "model" in suggestion_lower
+            or "reduce" in suggestion_lower
+            or "simplif" in suggestion_lower
+        )
 
     def test_oom_recovery_path_provided(self):
         """OOM error should provide recovery path."""
         handler = ErrorHandler()
 
-        result = handler.handle_error(
-            "oom",
-            {
-                "available_memory": "1GB",
-                "required_memory": "16GB"
-            }
-        )
+        result = handler.handle_error("oom", {"available_memory": "1GB", "required_memory": "16GB"})
 
         # Should include actionable next steps
         assert len(result["next_step"]) > 0
@@ -293,10 +264,7 @@ class TestOutOfMemoryScenario:
             sessions_dir.mkdir(parents=True, exist_ok=True)
 
             # Create session with large model
-            session = Session(
-                model="large-model",
-                working_directory=str(tmpdir)
-            )
+            session = Session(model="large-model", working_directory=str(tmpdir))
             session.save(sessions_dir)
 
             # Simulate model switch
@@ -316,11 +284,7 @@ class TestPermissionDeniedScenario:
         handler = ErrorHandler()
 
         result = handler.handle_error(
-            "permission_denied",
-            {
-                "path": "/root/.mlxcli/sessions",
-                "operation": "write"
-            }
+            "permission_denied", {"path": "/root/.mlxcli/sessions", "operation": "write"}
         )
 
         assert result["status"] == "handled"
@@ -333,21 +297,23 @@ class TestPermissionDeniedScenario:
         handler = ErrorHandler()
 
         result = handler.handle_error(
-            "permission_denied",
-            {"path": "/etc/config", "operation": "read"}
+            "permission_denied", {"path": "/etc/config", "operation": "read"}
         )
 
         suggestion_lower = result["suggestion"].lower()
         # Should mention checking/fixing permissions
-        assert "permission" in suggestion_lower or "chmod" in suggestion_lower or "check" in suggestion_lower
+        assert (
+            "permission" in suggestion_lower
+            or "chmod" in suggestion_lower
+            or "check" in suggestion_lower
+        )
 
     def test_permission_denied_alternative_path_suggested(self):
         """Permission error should suggest alternative paths."""
         handler = ErrorHandler()
 
         result = handler.handle_error(
-            "permission_denied",
-            {"path": "/restricted/file", "operation": "access"}
+            "permission_denied", {"path": "/restricted/file", "operation": "access"}
         )
 
         # Should have useful next steps
@@ -362,11 +328,7 @@ class TestDiskFullScenario:
         handler = ErrorHandler()
 
         result = handler.handle_error(
-            "disk_full",
-            {
-                "available_space": "100MB",
-                "required_space": "2GB"
-            }
+            "disk_full", {"available_space": "100MB", "required_space": "2GB"}
         )
 
         assert result["status"] == "handled"
@@ -377,17 +339,16 @@ class TestDiskFullScenario:
         handler = ErrorHandler()
 
         result = handler.handle_error(
-            "disk_full",
-            {"available_space": "50MB", "required_space": "1GB"}
+            "disk_full", {"available_space": "50MB", "required_space": "1GB"}
         )
 
         suggestion_lower = result["suggestion"].lower()
         # Should suggest cleanup actions
         assert (
-            "clean" in suggestion_lower or
-            "delete" in suggestion_lower or
-            "remove" in suggestion_lower or
-            "free" in suggestion_lower
+            "clean" in suggestion_lower
+            or "delete" in suggestion_lower
+            or "remove" in suggestion_lower
+            or "free" in suggestion_lower
         )
 
     def test_disk_full_session_survives(self):
@@ -397,10 +358,7 @@ class TestDiskFullScenario:
             sessions_dir.mkdir(parents=True, exist_ok=True)
 
             # Create and save session
-            session = Session(
-                model="test-model",
-                working_directory=str(tmpdir)
-            )
+            session = Session(model="test-model", working_directory=str(tmpdir))
             session.add_message(role="user", content="test message")
             saved_path = session.save(sessions_dir)
 
@@ -420,10 +378,9 @@ class TestContextTrimmingScenario:
         # Create large conversation
         messages = []
         for i in range(10):
-            messages.append({
-                "role": "user",
-                "content": "This is a test message. " * 20  # Large message
-            })
+            messages.append(
+                {"role": "user", "content": "This is a test message. " * 20}  # Large message
+            )
 
         should_trim = manager.should_trim(messages)
         assert should_trim
@@ -435,10 +392,9 @@ class TestContextTrimmingScenario:
         # Create messages with large content to trigger trimming
         messages = []
         for i in range(5):
-            messages.append({
-                "role": "user",
-                "content": f"Message {i}: " + ("x" * 100)  # Larger content
-            })
+            messages.append(
+                {"role": "user", "content": f"Message {i}: " + ("x" * 100)}  # Larger content
+            )
 
         # Trim to much smaller budget to force trimming
         trimmed = manager.trim_to_budget(messages, 20)
@@ -456,10 +412,12 @@ class TestContextTrimmingScenario:
         # Create conversation that will be trimmed
         messages = []
         for i in range(20):
-            messages.append({
-                "role": "user" if i % 2 == 0 else "assistant",
-                "content": "Test message content " * 5
-            })
+            messages.append(
+                {
+                    "role": "user" if i % 2 == 0 else "assistant",
+                    "content": "Test message content " * 5,
+                }
+            )
 
         trimmed = manager.trim_to_budget(messages, 200)
 
@@ -473,7 +431,7 @@ class TestContextTrimmingScenario:
 
         messages = [
             {"role": "user", "content": "Short"},  # ~1 token
-            {"role": "assistant", "content": "x" * 40}  # ~10 tokens
+            {"role": "assistant", "content": "x" * 40},  # ~10 tokens
         ]
 
         available = manager.get_available_tokens(messages)
@@ -491,10 +449,7 @@ class TestModelSwitchingScenario:
             sessions_dir.mkdir(parents=True, exist_ok=True)
 
             # Create session with initial model
-            session = Session(
-                model="llama-7b",
-                working_directory=str(tmpdir)
-            )
+            session = Session(model="llama-7b", working_directory=str(tmpdir))
             session.add_message(role="user", content="Hello")
             session.save(sessions_dir)
 
@@ -512,10 +467,7 @@ class TestModelSwitchingScenario:
         with tempfile.TemporaryDirectory() as tmpdir:
             sessions_dir = Path(tmpdir)
 
-            session = Session(
-                model="model-a",
-                working_directory=str(tmpdir)
-            )
+            session = Session(model="model-a", working_directory=str(tmpdir))
 
             # Build conversation
             session.add_message(role="user", content="msg1")
@@ -538,10 +490,7 @@ class TestModelSwitchingScenario:
         handler = ErrorHandler()
 
         # Simulate switch with error handling
-        result = handler.handle_error(
-            "model_not_found",
-            {"model_name": "nonexistent"}
-        )
+        result = handler.handle_error("model_not_found", {"model_name": "nonexistent"})
         assert result["status"] == "handled"
 
 
@@ -567,10 +516,7 @@ class TestFileOperationsScenario:
             sessions_dir.mkdir(parents=True, exist_ok=True)
 
             # Create session
-            session = Session(
-                model="test-model",
-                working_directory=str(tmpdir)
-            )
+            session = Session(model="test-model", working_directory=str(tmpdir))
             session.add_message(role="user", content="test")
 
             # Save session
@@ -587,8 +533,7 @@ class TestFileOperationsScenario:
         handler = ErrorHandler()
 
         result = handler.handle_error(
-            "permission_denied",
-            {"path": "/restricted/file.json", "operation": "read"}
+            "permission_denied", {"path": "/restricted/file.json", "operation": "read"}
         )
 
         assert result["status"] == "handled"
@@ -655,10 +600,7 @@ class TestSessionDeletionScenario:
             sessions_dir.mkdir(parents=True, exist_ok=True)
 
             # Create and save session
-            session = Session(
-                model="test",
-                working_directory=str(tmpdir)
-            )
+            session = Session(model="test", working_directory=str(tmpdir))
             session.save(sessions_dir)
 
             session_file = sessions_dir / f"session_{session.id}.json"
@@ -706,24 +648,17 @@ class TestFullWorkflowWithRecovery:
             sessions_dir.mkdir(parents=True, exist_ok=True)
 
             # 1. Create session
-            session = Session(
-                model="test-model",
-                working_directory=str(tmpdir)
-            )
+            session = Session(model="test-model", working_directory=str(tmpdir))
             session.add_message(role="user", content="Hello")
             session.save(sessions_dir)
 
             # 2. Handle model error
-            model_result = handler.handle_error(
-                "model_not_found",
-                {"model_name": "missing-model"}
-            )
+            model_result = handler.handle_error("model_not_found", {"model_name": "missing-model"})
             assert model_result["status"] == "handled"
 
             # 3. Handle timeout
             timeout_result = handler.handle_error(
-                "timeout",
-                {"timeout_seconds": 30, "operation": "inference"}
+                "timeout", {"timeout_seconds": 30, "operation": "inference"}
             )
             assert timeout_result["status"] == "handled"
 
@@ -764,10 +699,7 @@ class TestMultipleErrorsInSequence:
             sessions_dir = Path(tmpdir)
             sessions_dir.mkdir(parents=True, exist_ok=True)
 
-            session = Session(
-                model="original-model",
-                working_directory=str(tmpdir)
-            )
+            session = Session(model="original-model", working_directory=str(tmpdir))
 
             # Add message after each simulated error
             for i in range(5):
@@ -789,7 +721,7 @@ class TestErrorHandlerLogging:
         context = {
             "operation": "model_load",
             "model_name": "test-model",
-            "timestamp": "2025-01-01T00:00:00"
+            "timestamp": "2025-01-01T00:00:00",
         }
         error = RuntimeError("Failed to load")
 
@@ -848,14 +780,11 @@ class TestContextManagerWithErrors:
         messages = [
             {"role": "user"},  # Missing content
             {"content": "text"},  # Missing role
-            {"role": "assistant", "content": "valid message"}
+            {"role": "assistant", "content": "valid message"},
         ]
 
         # Should not raise, handle gracefully
-        total_tokens = sum(
-            manager.get_context_size(msg.get("content", ""))
-            for msg in messages
-        )
+        total_tokens = sum(manager.get_context_size(msg.get("content", "")) for msg in messages)
         assert total_tokens >= 0
 
     def test_trimming_with_edge_case_tokens(self):
@@ -881,10 +810,7 @@ class TestToolRegistryErrorHandling:
         shell_tool = ShellTool()
 
         # Tool should be usable
-        result = shell_tool.execute({
-            "action": "execute",
-            "command": "echo test"
-        })
+        result = shell_tool.execute({"action": "execute", "command": "echo test"})
         assert result["status"] == "ok"
 
     def test_shell_tool_command_error_handling(self):
@@ -892,10 +818,7 @@ class TestToolRegistryErrorHandling:
         tool = ShellTool()
 
         # Non-existent command
-        result = tool.execute({
-            "action": "execute",
-            "command": "nonexistent_command_12345"
-        })
+        result = tool.execute({"action": "execute", "command": "nonexistent_command_12345"})
 
         assert result["status"] == "ok"
         assert result["returncode"] != 0
@@ -932,10 +855,7 @@ class TestCLIErrorMessageQuality:
         """Error messages should include actionable recovery steps."""
         handler = ErrorHandler()
 
-        result = handler.handle_error(
-            "model_not_found",
-            {"model_name": "test"}
-        )
+        result = handler.handle_error("model_not_found", {"model_name": "test"})
 
         # Check message quality
         assert len(result["error"]) > 0

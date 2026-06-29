@@ -172,5 +172,7 @@ class ShellTool(Tool):
             "status": "ok",
             "preview": command,
             "dangerous": dangerous,
-            "message": "Dangerous command - requires confirmation" if dangerous else "Safe to execute",
+            "message": (
+                "Dangerous command - requires confirmation" if dangerous else "Safe to execute"
+            ),
         }

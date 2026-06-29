@@ -139,9 +139,7 @@ class FileTool(Tool):
             file_path.write_text(content)
 
             # If it's a session file, set secure permissions (chmod 600)
-            if file_path.name.endswith(".session.json") or ".sessions/" in str(
-                file_path
-            ):
+            if file_path.name.endswith(".session.json") or ".sessions/" in str(file_path):
                 file_path.chmod(0o600)
 
             return {

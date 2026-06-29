@@ -52,8 +52,10 @@ class TestFileCompleter:
             # Check that completions contain README files (check display)
             completion_displays = []
             for c in completions:
-                if hasattr(c.display, '__iter__'):
-                    display_text = ''.join(str(item[1]) if isinstance(item, tuple) else str(item) for item in c.display)
+                if hasattr(c.display, "__iter__"):
+                    display_text = "".join(
+                        str(item[1]) if isinstance(item, tuple) else str(item) for item in c.display
+                    )
                 else:
                     display_text = str(c.display)
                 completion_displays.append(display_text)
@@ -157,8 +159,10 @@ class TestCommandCompleter:
         completion_displays = []
         for c in completions:
             # Display is a FormattedText object, extract the text
-            if hasattr(c.display, '__iter__'):
-                display_text = ''.join(str(item[1]) if isinstance(item, tuple) else str(item) for item in c.display)
+            if hasattr(c.display, "__iter__"):
+                display_text = "".join(
+                    str(item[1]) if isinstance(item, tuple) else str(item) for item in c.display
+                )
             else:
                 display_text = str(c.display)
             completion_displays.append(display_text)
@@ -178,8 +182,10 @@ class TestCommandCompleter:
         # Check display
         completion_displays = []
         for c in completions:
-            if hasattr(c.display, '__iter__'):
-                display_text = ''.join(str(item[1]) if isinstance(item, tuple) else str(item) for item in c.display)
+            if hasattr(c.display, "__iter__"):
+                display_text = "".join(
+                    str(item[1]) if isinstance(item, tuple) else str(item) for item in c.display
+                )
             else:
                 display_text = str(c.display)
             completion_displays.append(display_text)

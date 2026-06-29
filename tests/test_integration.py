@@ -38,9 +38,7 @@ class TestFullWorkflow:
         yield tmpdir
         shutil.rmtree(tmpdir)
 
-    def test_full_workflow_create_project_use_tools_save_load_session(
-        self, temp_project
-    ):
+    def test_full_workflow_create_project_use_tools_save_load_session(self, temp_project):
         """End-to-end: create project → use FileTool → save session → load session."""
         # Mock get_project_root for this test
         import mlxcli.context as ctx_module
@@ -294,9 +292,7 @@ class TestFileToolIntegration:
             (temp_project / "docs" / "readme.md").touch()
 
             file_tool = FileTool()
-            result = file_tool.execute(
-                {"action": "list_dir", "path": str(temp_project)}
-            )
+            result = file_tool.execute({"action": "list_dir", "path": str(temp_project)})
 
             assert result["status"] == "ok"
             dirs = result["dirs"]
@@ -452,9 +448,7 @@ class TestProjectContextIntegration:
 
         # Verify it's stored and retrievable (use resolve() to handle macOS /private prefix)
         assert session.context["project_type"] == "python"
-        assert (
-            Path(session.context["project_root"]).resolve() == python_project.resolve()
-        )
+        assert Path(session.context["project_root"]).resolve() == python_project.resolve()
 
 
 class TestComplexWorkflows:
@@ -688,9 +682,7 @@ class TestDirectoryHandling:
 
         try:
             file_tool = FileTool()
-            result = file_tool.execute(
-                {"action": "list_dir", "path": str(complex_project)}
-            )
+            result = file_tool.execute({"action": "list_dir", "path": str(complex_project)})
 
             assert result["status"] == "ok"
             dirs = result["dirs"]

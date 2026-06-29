@@ -146,9 +146,7 @@ class MLXBackend:
                 "model_not_found",
                 {"model_name": self.current_model_name or "unknown"},
             )
-            raise RuntimeError(
-                f"{error_result['error']}. {error_result['suggestion']}"
-            )
+            raise RuntimeError(f"{error_result['error']}. {error_result['suggestion']}")
 
         # Trim messages to fit context window
         if messages:

@@ -218,9 +218,7 @@ class TestCLIModelSelection:
 
             # Mock the backend to return models
             cli.backend.get_available_models = MagicMock(
-                return_value=[
-                    {"name": "model1", "size": "7GB", "description": "Test model 1"}
-                ]
+                return_value=[{"name": "model1", "size": "7GB", "description": "Test model 1"}]
             )
             # Also mock load_model to return True
             cli.backend.load_model = MagicMock(return_value=True)
@@ -328,9 +326,7 @@ class TestCLIIntegration:
 
             # Mock the backend
             cli.backend.get_available_models = MagicMock(
-                return_value=[
-                    {"name": "test-model", "size": "7GB", "description": "Test model"}
-                ]
+                return_value=[{"name": "test-model", "size": "7GB", "description": "Test model"}]
             )
             cli.backend.load_model = MagicMock(return_value=True)
             cli.backend.current_model_name = "test-model"

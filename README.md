@@ -275,8 +275,8 @@ pytest tests/test_session.py::TestSessionPersistence -v
 The project follows strict code quality standards:
 
 ```bash
-# Format code with black (88 char lines)
-black mlxcli tests
+# Format code with black (100 char lines)
+black mlxcli tests --line-length 100
 
 # Lint and auto-fix issues
 ruff check mlxcli tests --fix
@@ -314,16 +314,22 @@ mlxcli/
 
 ### Test Coverage
 
-Current test suite (242 tests):
-- **Unit tests**: 226 tests covering all components
-- **Integration tests**: 16 tests for end-to-end workflows
+Current test suite (474 tests):
+- **Phase 1**: 242 tests covering core components
+- **Phase 2**: 232 new tests for advanced features
 - **Areas covered**:
   - Session persistence and recovery
   - Tool registry and execution
   - File operations with backups
   - Project context discovery
+  - Shell command execution with safety gates
+  - Error handling and recovery strategies
+  - Model management and switching
+  - Session info and listing
+  - Auto-completion functionality
+  - Context-aware message trimming
   - Complex multi-operation workflows
-  - Error handling and edge cases
+  - Full end-to-end error scenarios
 
 ### Version Requirements
 
@@ -339,28 +345,122 @@ Current test suite (242 tests):
 - **MLX**: Compatible with macOS 13+
 - **Dependencies**: See `pyproject.toml`
 
+## Advanced Features (v0.2)
+
+### Shell Command Execution
+Execute shell commands with auto-confirmation for dangerous operations:
+
+```bash
+mlx-cli> ! ls -la
+mlx-cli> ! python script.py
+
+# Dangerous commands require explicit confirmation:
+mlx-cli> ! rm -rf /tmp
+⚠️  Potentially dangerous command: rm -rf /tmp
+Set confirmed=True to override
+```
+
+### Enhanced Model Management
+Switch between models within the same session:
+
+```bash
+mlx-cli> /model list
+📦 Available Models:
+  1. meta-llama/Llama-2-7b-hf
+     Llama 2 7B (good for most use cases)
+     Size: ~7GB
+
+mlx-cli> /model switch meta-llama/Llama-2-13b-hf
+✓ Switched to meta-llama/Llama-2-13b-hf
+```
+
+### Improved Session Management
+Better session organization and info:
+
+```bash
+mlx-cli> /sessions
+📋 Saved Sessions:
+
+  1. session_abc123
+     Model: meta-llama/Llama-2-7b-hf
+     Messages: 12
+     Last: "How does machine learning work? ..."
+     Updated: 2026-06-30T15:45:00
+
+mlx-cli> /delete session_abc123
+```
+
+### Command Auto-Completion
+Tab completion for commands, files, and models:
+
+```bash
+mlx-cli> /mod[TAB]
+/model           /model list      /model switch
+
+mlx-cli> @REA[TAB]
+@README.md       @README.txt
+
+History: Ctrl+R for command history search
+```
+
+### Context-Aware Conversations
+Automatic trimming of long conversation history:
+- Keeps most recent messages within token budget
+- Preserves conversation coherence
+- Prevents token limit errors
+
+### Error Recovery
+Graceful handling of common errors:
+- Model not found → Download suggestions
+- Out of memory → Model switching options
+- Corrupted sessions → Automatic recovery
+- Command timeouts → Simplified suggestions
+
+## Development Guide
+
+### Running Tests
+```bash
+# Run all tests
+pytest -v
+
+# Run specific test
+pytest tests/test_error_scenarios.py -v
+
+# Run with coverage
+pytest --cov=mlxcli
+```
+
+### Code Quality
+```bash
+# Format code (100 char lines)
+black mlxcli tests --line-length 100
+
+# Lint code
+ruff check mlxcli tests --fix
+
+# Type check
+mypy mlxcli --ignore-missing-imports --python-version 3.10
+```
+
+### Architecture
+See CLAUDE.md for detailed component documentation and Phase 2 additions.
+
 ## Roadmap
 
-### Phase 1 (v0.1) - Core
-- [x] Design complete
-- [ ] CLI REPL setup
-- [ ] Session management
-- [ ] File operations with backup
-- [ ] MLX integration
-- [ ] Project context discovery
+### Phase 2 (v0.2) - Polish ✓
+- [x] ShellTool with safety gates
+- [x] Comprehensive error handling
+- [x] Enhanced model and session management
+- [x] Auto-completion support
+- [x] Token-aware context management
 
-### Phase 2 (v0.2) - Polish
-- [ ] Shell tool with safety guards
-- [ ] Session switching UI
-- [ ] Model management
-- [ ] Command auto-completion
-
-### Phase 3 (v1.0) - Extensions
-- [ ] Web fetching tool
-- [ ] Code execution sandbox
-- [ ] Plugin system (MCP)
-- [ ] Multi-backend support
-- [ ] Specialized agents
+### Phase 3 (v1.0) - Extension (Planned)
+- WebFetch tool for web research
+- Code execution tool (sandboxed)
+- MCP (Model Context Protocol) support
+- Multi-backend support (Ollama, OpenAI)
+- Specialized agents (analyzer, debugger, researcher)
+- Custom workflow definitions
 
 ## License
 

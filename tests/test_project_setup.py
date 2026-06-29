@@ -69,9 +69,7 @@ class TestPyprojectToml:
         }
 
         dependencies = data["project"].get("dependencies", [])
-        dep_dict = {
-            dep.split(">=")[0].split("<")[0].strip(): dep for dep in dependencies
-        }
+        dep_dict = {dep.split(">=")[0].split("<")[0].strip(): dep for dep in dependencies}
 
         for pkg, min_version in required_deps.items():
             assert pkg in dep_dict, f"Missing required dependency: {pkg}"

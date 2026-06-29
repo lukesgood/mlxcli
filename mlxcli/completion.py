@@ -100,9 +100,7 @@ class FileCompleter(Completer):
 
         return sorted(matches)
 
-    def get_completions(
-        self, document: Document, complete_event
-    ) -> Iterator[Completion]:
+    def get_completions(self, document: Document, complete_event) -> Iterator[Completion]:
         """Get completions for file paths after @.
 
         Args:
@@ -161,9 +159,7 @@ class CommandCompleter(Completer):
         "/delete",
     ]
 
-    def get_completions(
-        self, document: Document, complete_event
-    ) -> Iterator[Completion]:
+    def get_completions(self, document: Document, complete_event) -> Iterator[Completion]:
         """Get completions for slash commands.
 
         Args:
@@ -250,9 +246,7 @@ def setup_completion(project_root: Path) -> Completer:
             self.file_completer = file_completer
             self.command_completer = command_completer
 
-        def get_completions(
-            self, document: Document, complete_event
-        ) -> Iterator[Completion]:
+        def get_completions(self, document: Document, complete_event) -> Iterator[Completion]:
             """Route to appropriate completer based on context.
 
             Args:
@@ -272,16 +266,12 @@ def setup_completion(project_root: Path) -> Completer:
 
                 # Use file completer if @ comes after /
                 if slash_index < at_index:
-                    yield from self.file_completer.get_completions(
-                        document, complete_event
-                    )
+                    yield from self.file_completer.get_completions(document, complete_event)
                     return
 
             # Check for command completion
             if "/" in text:
-                yield from self.command_completer.get_completions(
-                    document, complete_event
-                )
+                yield from self.command_completer.get_completions(document, complete_event)
                 return
 
     return CombinedCompleter(file_completer, command_completer)

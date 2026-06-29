@@ -184,9 +184,7 @@ class ErrorHandler:
                 "and start a new session. The corrupted file is saved in "
                 ".mlxcli/sessions/session_{session_id}.json"
             ),
-            "next_step": (
-                "Create a new session or recover using recover_corrupted() method."
-            ),
+            "next_step": ("Create a new session or recover using recover_corrupted() method."),
             "session_id": session_id,
             "error_detail": error_detail,
         }

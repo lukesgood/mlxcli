@@ -44,9 +44,7 @@ class TestMLXBackendCreation:
         """current_model_name should be a string (or None)."""
         backend = MLXBackend()
 
-        assert backend.current_model_name is None or isinstance(
-            backend.current_model_name, str
-        )
+        assert backend.current_model_name is None or isinstance(backend.current_model_name, str)
 
 
 class TestMLXBackendAvailableModels:
@@ -147,9 +145,7 @@ class TestMLXBackendLoadModel:
         backend.load_model("meta-llama/Llama-2-7b-hf")
 
         # Should be the model name or None, not uninitialized
-        assert backend.current_model_name is None or isinstance(
-            backend.current_model_name, str
-        )
+        assert backend.current_model_name is None or isinstance(backend.current_model_name, str)
 
     def test_can_set_model_name_explicitly(self):
         """Should be able to set current_model_name."""

@@ -76,9 +76,7 @@ class TestFileTool:
         # Compare resolved paths to handle symlink/realpath differences on macOS
         assert Path(result["path"]).resolve() == test_file.resolve()
 
-    def test_file_tool_returns_error_for_nonexistent_file(
-        self, temp_project, file_tool
-    ):
+    def test_file_tool_returns_error_for_nonexistent_file(self, temp_project, file_tool):
         """FileTool returns error for non-existent files."""
         nonexistent = temp_project / "nonexistent.txt"
 
@@ -106,16 +104,12 @@ class TestFileTool:
         assert backup_file.exists()
         assert backup_file.read_text() == original_content
 
-    def test_file_tool_can_create_new_files_without_backup(
-        self, temp_project, file_tool
-    ):
+    def test_file_tool_can_create_new_files_without_backup(self, temp_project, file_tool):
         """FileTool can create new files without backup."""
         new_file = temp_project / "new.txt"
         content = "New file content"
 
-        result = file_tool.execute(
-            {"action": "write", "path": str(new_file), "content": content}
-        )
+        result = file_tool.execute({"action": "write", "path": str(new_file), "content": content})
 
         assert result["status"] == "ok"
         assert result["backup_created"] is False
@@ -166,9 +160,7 @@ class TestFileTool:
         assert result["status"] == "error"
         assert "message" in result
 
-    def test_file_tool_handles_permission_errors_gracefully(
-        self, temp_project, file_tool
-    ):
+    def test_file_tool_handles_permission_errors_gracefully(self, temp_project, file_tool):
         """FileTool handles permission errors gracefully."""
         # Create a file and remove read permissions
         test_file = temp_project / "readonly.txt"
@@ -188,9 +180,7 @@ class TestFileTool:
         test_file = temp_project / "test.txt"
         content = "Test content for size"
 
-        result = file_tool.execute(
-            {"action": "write", "path": str(test_file), "content": content}
-        )
+        result = file_tool.execute({"action": "write", "path": str(test_file), "content": content})
 
         assert result["status"] == "ok"
         assert "size" in result

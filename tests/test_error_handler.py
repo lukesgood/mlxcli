@@ -58,10 +58,7 @@ class TestErrorHandlerHandleError:
         assert result["status"] == "handled"
         assert "suggestion" in result
         # Should suggest reduction of resources or smaller model
-        assert (
-            "reduce" in result["suggestion"].lower()
-            or "simplif" in result["suggestion"].lower()
-        )
+        assert "reduce" in result["suggestion"].lower() or "simplif" in result["suggestion"].lower()
 
     def test_handle_error_session_corrupted_returns_recovery_strategy(self):
         """handle_error should return recovery strategy for corrupted session."""
@@ -77,9 +74,7 @@ class TestErrorHandlerHandleError:
         # Should explain the issue
         assert "session" in result["error"].lower()
         # Should suggest recovery
-        assert "recover" in result["suggestion"].lower() or (
-            "new" in result["suggestion"].lower()
-        )
+        assert "recover" in result["suggestion"].lower() or ("new" in result["suggestion"].lower())
 
     def test_handle_error_timeout_suggests_simplification(self):
         """timeout error should suggest simplifying the prompt."""
@@ -92,10 +87,7 @@ class TestErrorHandlerHandleError:
         # Should mention timeout
         assert "timeout" in result["error"].lower() or "timed out" in result["error"].lower()
         # Should suggest simplification
-        assert (
-            "simplif" in result["suggestion"].lower()
-            or "reduce" in result["suggestion"].lower()
-        )
+        assert "simplif" in result["suggestion"].lower() or "reduce" in result["suggestion"].lower()
 
     def test_handle_error_permission_denied_returns_dict(self):
         """handle_error should return dict for permission denied error."""
@@ -414,9 +406,7 @@ class TestErrorHandlerIntegration:
         handler = ErrorHandler()
 
         # Handle an error
-        result = handler.handle_error(
-            "model_not_found", {"model_name": "test-model"}
-        )
+        result = handler.handle_error("model_not_found", {"model_name": "test-model"})
 
         assert result["status"] == "handled"
         assert "error" in result

@@ -29,9 +29,7 @@ class Session:
     model: str
     working_directory: str
     id: str = field(
-        default_factory=lambda: "".join(
-            random.choices(string.ascii_letters + string.digits, k=8)
-        )
+        default_factory=lambda: "".join(random.choices(string.ascii_letters + string.digits, k=8))
     )
     created_at: datetime = field(default_factory=datetime.now)
     updated_at: datetime = field(default_factory=datetime.now)
@@ -231,9 +229,7 @@ class Session:
         return sessions
 
     @staticmethod
-    def recover_corrupted(
-        session_id: str, sessions_dir: Optional[Path] = None
-    ) -> "Session":
+    def recover_corrupted(session_id: str, sessions_dir: Optional[Path] = None) -> "Session":
         """Recover from a corrupted session by creating a new session.
 
         Creates a new session with the same session_id. The corrupted session

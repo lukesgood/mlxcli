@@ -151,7 +151,9 @@ class TestSessionGetSummary:
     def test_get_summary_truncates_last_message_to_50_chars(self):
         """get_summary() should truncate last_message to 50 characters."""
         session = Session(model="test", working_directory="/tmp")
-        long_message = "This is a very long message that should be truncated to exactly fifty characters max"
+        long_message = (
+            "This is a very long message that should be truncated to exactly fifty characters max"
+        )
         session.add_message(role="user", content=long_message)
 
         summary = session.get_summary()
@@ -377,11 +379,7 @@ class TestCLIListSessionsCommand:
                     output = mock_stdout.getvalue()
 
                 # Should contain "no" or "empty" or similar
-                assert (
-                    "no" in output.lower()
-                    or "empty" in output.lower()
-                    or len(output) > 0
-                )
+                assert "no" in output.lower() or "empty" in output.lower() or len(output) > 0
 
             finally:
                 cli_module.get_project_root = original_get_project_root
@@ -439,9 +437,7 @@ class TestCLIListSessionsCommand:
                 sessions_dir = Path(tmpdir) / ".mlxcli" / "sessions"
                 sessions_dir.mkdir(parents=True)
 
-                session = Session(
-                    model="meta-llama/Llama-2-7b-hf", working_directory="/tmp"
-                )
+                session = Session(model="meta-llama/Llama-2-7b-hf", working_directory="/tmp")
                 session.add_message(role="user", content="Test")
                 session.save(sessions_dir)
 
