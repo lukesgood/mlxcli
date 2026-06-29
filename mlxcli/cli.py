@@ -219,7 +219,8 @@ class CLI:
         Supported commands:
         - help: Show help text
         - model: Show current model or subcommands (list, switch)
-        - sessions: List saved sessions
+        - sessions: List saved sessions or subcommands (delete <id>)
+        - delete: Delete a session
         - save: Manually save session
         - exit: Exit the CLI
 
@@ -238,7 +239,13 @@ class CLI:
             return self._handle_model_command(args)
 
         elif cmd == "sessions":
-            self._list_sessions()
+            return self._handle_sessions_command(args)
+
+        elif cmd == "delete":
+            if not args:
+                print("Usage: /delete <session_id>")
+                return True
+            self._delete_session_command(args)
             return True
 
         elif cmd == "save":
@@ -354,19 +361,96 @@ class CLI:
         else:
             print(f"✗ Failed to load {model_name}")
 
+    def _handle_sessions_command(self, args: str) -> bool:
+        """Route /sessions subcommands.
+
+        Supported subcommands:
+        - (no args): List all sessions
+        - delete <id>: Delete a session
+
+        Args:
+            args: Subcommand and arguments.
+
+        Returns:
+            bool: True to continue REPL loop.
+        """
+        if not args or args.strip() == "":
+            # No args - list sessions
+            self._list_sessions_command()
+            return True
+
+        parts = args.split(maxsplit=1)
+        subcommand = parts[0].lower()
+
+        if subcommand == "delete":
+            if len(parts) < 2:
+                print("Usage: /sessions delete <session_id>")
+                return True
+            session_id = parts[1]
+            self._delete_session_command(session_id)
+            return True
+
+        else:
+            print(f"Unknown sessions subcommand: {subcommand}")
+            print("Usage: /sessions [delete <id>]")
+            return True
+
+    def _list_sessions_command(self) -> None:
+        """List all sessions with summaries."""
+        from pathlib import Path
+
+        # Get the sessions directory
+        sessions_dir = self.project_root / ".mlxcli" / "sessions"
+
+        sessions = Session.list_sessions(sessions_dir)
+
+        if not sessions:
+            print("📋 No saved sessions.")
+            return
+
+        print("📋 Saved Sessions:\n")
+        for i, session in enumerate(sessions, 1):
+            summary = session.get_summary()
+            print(f"  {i}. {summary['id']}")
+            print(f"     Model: {summary['model']}")
+            print(f"     Messages: {summary['message_count']}")
+            if summary["last_message"]:
+                print(f'     Last: "{summary["last_message"]}..."')
+            print(f"     Updated: {summary['updated']}")
+            print()
+
+    def _delete_session_command(self, session_id: str) -> None:
+        """Delete a session.
+
+        Args:
+            session_id: The session ID to delete.
+        """
+        from pathlib import Path
+
+        # Get the sessions directory
+        sessions_dir = self.project_root / ".mlxcli" / "sessions"
+
+        result = Session.delete_session(session_id, sessions_dir)
+        if result:
+            print(f"✓ Session deleted: {session_id}")
+        else:
+            print(f"✗ Session not found: {session_id}")
+
     def _print_help(self) -> None:
         """Print help text with available commands."""
         help_text = """
 MLX-CLI Commands:
 ================
 
-  /help              Show this help message
-  /model             Show current model info
-  /model list        List available models
-  /model switch NAME Switch to different model
-  /sessions          List saved sessions
-  /save              Manually save the current session
-  /exit              Exit the CLI
+  /help                    Show this help message
+  /model                   Show current model info
+  /model list              List available models
+  /model switch NAME       Switch to different model
+  /sessions                List saved sessions
+  /sessions delete <id>    Delete a session
+  /delete <id>             Delete a session (shorthand)
+  /save                    Manually save the current session
+  /exit                    Exit the CLI
 
 Regular text will be sent to the AI model for response.
 Use @filename syntax to reference files (phase 2 feature).
@@ -374,19 +458,8 @@ Use @filename syntax to reference files (phase 2 feature).
         print(help_text)
 
     def _list_sessions(self) -> None:
-        """List all saved sessions."""
-        sessions = Session.list_sessions()
-
-        if not sessions:
-            print("No saved sessions.")
-            return
-
-        print("\nSaved Sessions:")
-        print("-" * 60)
-        for session in sessions:
-            created = session.created_at.strftime("%Y-%m-%d %H:%M:%S")
-            print(f"  {session.id} | {session.model} | Created: {created}")
-        print("-" * 60)
+        """List all saved sessions (deprecated - use _list_sessions_command)."""
+        self._list_sessions_command()
 
     def _handle_conversation(self, user_input: str) -> None:
         """Handle user message for conversation.

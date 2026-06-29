@@ -1,0 +1,20 @@
+{
+  "id": "G0KAaWDY",
+  "created_at": "2026-06-30T08:19:30.255178",
+  "updated_at": "2026-06-30T08:19:30.255180",
+  "model": "test-model",
+  "working_directory": "/private/var/folders/zg/r1xpyw0x7wz73wdwcb344n840000gn/T/tmpm_56o9hg",
+  "messages": [],
+  "context": {
+    "project_root": "/private/var/folders/zg/r1xpyw0x7wz73wdwcb344n840000gn/T/tmpm_56o9hg",
+    "project_type": "unknown",
+    "file_tree": "",
+    "metadata": {
+      "top_level_files": [],
+      "readme_excerpt": null,
+      "project_type": "unknown",
+      "has_src": false,
+      "has_tests": false
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "id": "RpCV1KNf",
+  "created_at": "2026-06-30T08:13:46.905258",
+  "updated_at": "2026-06-30T08:13:46.905258",
+  "model": "test-model",
+  "working_directory": "/private/var/folders/zg/r1xpyw0x7wz73wdwcb344n840000gn/T/tmpepvak17d",
+  "messages": [],
+  "context": {
+    "project_root": "/private/var/folders/zg/r1xpyw0x7wz73wdwcb344n840000gn/T/tmpepvak17d",
+    "project_type": "unknown",
+    "file_tree": "",
+    "metadata": {
+      "top_level_files": [],
+      "readme_excerpt": null,
+      "project_type": "unknown",
+      "has_src": false,
+      "has_tests": false
+    }
+  }
+}

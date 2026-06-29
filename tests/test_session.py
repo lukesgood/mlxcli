@@ -363,7 +363,7 @@ class TestSessionPersistence:
         assert session3.id in session_ids
 
     def test_list_sessions_returns_sorted_sessions(self, temp_project):
-        """list_sessions should return sessions sorted by created_at."""
+        """list_sessions should return sessions sorted by updated_at (most recent first)."""
         sessions_dir = temp_project / ".mlxcli" / "sessions"
 
         # Create sessions with a small delay to ensure different timestamps
@@ -382,9 +382,9 @@ class TestSessionPersistence:
         listed = Session.list_sessions(sessions_dir)
 
         assert len(listed) == 3
-        # Should be sorted by created_at in ascending order
+        # Should be sorted by updated_at in descending order (most recent first)
         for i in range(len(listed) - 1):
-            assert listed[i].created_at <= listed[i + 1].created_at
+            assert listed[i].updated_at >= listed[i + 1].updated_at
 
     def test_list_sessions_returns_empty_for_no_sessions(self, temp_project):
         """list_sessions should return empty list when no sessions exist."""

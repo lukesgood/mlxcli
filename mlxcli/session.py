@@ -151,6 +151,55 @@ class Session:
 
         return session
 
+    def get_summary(self) -> dict:
+        """Get session summary for display.
+
+        Returns:
+            Dictionary with keys:
+            - id: Session ID
+            - model: Model name
+            - created: ISO8601 created timestamp
+            - updated: ISO8601 updated timestamp
+            - message_count: Number of messages
+            - last_message: First 50 chars of last message (empty if no messages)
+        """
+        # Get last message content, truncated to 50 chars
+        last_message = ""
+        if self.messages:
+            last_msg_content = self.messages[-1].get("content", "")
+            last_message = last_msg_content[:50]
+
+        return {
+            "id": self.id,
+            "model": self.model,
+            "created": self.created_at.isoformat(),
+            "updated": self.updated_at.isoformat(),
+            "message_count": len(self.messages),
+            "last_message": last_message,
+        }
+
+    @staticmethod
+    def delete_session(session_id: str, sessions_dir: Optional[Path] = None) -> bool:
+        """Delete a session file.
+
+        Args:
+            session_id: The session ID to delete.
+            sessions_dir: Path to sessions directory. If None, uses default.
+
+        Returns:
+            True if deleted, False if not found.
+        """
+        if sessions_dir is None:
+            sessions_dir = Session._get_default_sessions_dir()
+
+        session_file = sessions_dir / f"session_{session_id}.json"
+
+        if not session_file.exists():
+            return False
+
+        session_file.unlink()
+        return True
+
     @staticmethod
     def list_sessions(sessions_dir: Optional[Path] = None) -> list["Session"]:
         """List all saved sessions.
@@ -159,7 +208,7 @@ class Session:
             sessions_dir: Path to sessions directory. If None, uses default.
 
         Returns:
-            List of Session instances sorted by created_at.
+            List of Session instances sorted by updated_at (most recent first).
         """
         if sessions_dir is None:
             sessions_dir = Session._get_default_sessions_dir()
@@ -177,8 +226,8 @@ class Session:
                 # Skip corrupted session files
                 pass
 
-        # Sort by created_at
-        sessions.sort(key=lambda s: s.created_at)
+        # Sort by updated_at in ascending order, then reverse to get most recent first
+        sessions.sort(key=lambda s: s.updated_at, reverse=True)
         return sessions
 
     @staticmethod
