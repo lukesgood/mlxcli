@@ -1,10 +1,11 @@
 """Tests for ProjectContext - auto-discovery of project structure and metadata."""
 
-import pytest
+import shutil
 import sys
 import tempfile
-import shutil
 from pathlib import Path
+
+import pytest
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -150,6 +151,7 @@ class TestFileTreeGeneration:
     def test_file_tree_is_lazy_loaded(self, sample_project):
         """file_tree should be lazy-loaded (not computed on init)."""
         from functools import cached_property
+
         context = ProjectContext(sample_project)
         # Check that file_tree is a property or cached_property
         assert hasattr(ProjectContext, "file_tree")
@@ -200,7 +202,9 @@ class TestMetadataExtraction:
         tmpdir = Path(tempfile.mkdtemp())
 
         # Create top-level files
-        (tmpdir / "README.md").write_text("# My Project\n\nThis is a great project with lots of features.")
+        (tmpdir / "README.md").write_text(
+            "# My Project\n\nThis is a great project with lots of features."
+        )
         (tmpdir / "LICENSE").touch()
         (tmpdir / "setup.py").touch()
         (tmpdir / "pyproject.toml").touch()

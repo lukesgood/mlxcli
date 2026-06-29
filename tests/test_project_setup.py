@@ -1,9 +1,9 @@
 """Tests for project setup and structure."""
 
-import json
 import sys
-import tomllib
 from pathlib import Path
+
+import tomllib
 
 
 class TestPyprojectToml:
@@ -49,8 +49,9 @@ class TestPyprojectToml:
             data = tomllib.load(f)
         assert "requires-python" in data["project"], "Missing requires-python"
         requires_python = data["project"]["requires-python"]
-        assert ">= 3.10" in requires_python or ">=3.10" in requires_python, \
-            f"requires-python should be >= 3.10, got {requires_python}"
+        assert (
+            ">= 3.10" in requires_python or ">=3.10" in requires_python
+        ), f"requires-python should be >= 3.10, got {requires_python}"
 
     def test_pyproject_has_required_dependencies(self):
         """[project] should have all required dependencies."""
@@ -68,14 +69,16 @@ class TestPyprojectToml:
         }
 
         dependencies = data["project"].get("dependencies", [])
-        dep_dict = {dep.split(">=")[0].split("<")[0].strip(): dep
-                    for dep in dependencies}
+        dep_dict = {
+            dep.split(">=")[0].split("<")[0].strip(): dep for dep in dependencies
+        }
 
         for pkg, min_version in required_deps.items():
             assert pkg in dep_dict, f"Missing required dependency: {pkg}"
             dep_str = dep_dict[pkg]
-            assert ">=" in dep_str or ">" in dep_str, \
-                f"{pkg} should have version constraint: {dep_str}"
+            assert (
+                ">=" in dep_str or ">" in dep_str
+            ), f"{pkg} should have version constraint: {dep_str}"
 
     def test_pyproject_has_dev_dependencies(self):
         """[project.optional-dependencies] should have dev dependencies."""
@@ -93,8 +96,7 @@ class TestPyprojectToml:
 
         optional_deps = data["project"].get("optional-dependencies", {})
         dev_deps = optional_deps.get("dev", [])
-        dev_dict = {dep.split(">=")[0].split("<")[0].strip(): dep
-                    for dep in dev_deps}
+        dev_dict = {dep.split(">=")[0].split("<")[0].strip(): dep for dep in dev_deps}
 
         for pkg, min_version in required_dev.items():
             assert pkg in dev_dict, f"Missing dev dependency: {pkg}"
@@ -113,6 +115,7 @@ class TestPackageInit:
         sys.path.insert(0, str(Path(__file__).parent.parent))
         try:
             import mlxcli
+
             assert mlxcli is not None
         finally:
             sys.path.pop(0)
@@ -122,6 +125,7 @@ class TestPackageInit:
         sys.path.insert(0, str(Path(__file__).parent.parent))
         try:
             import mlxcli
+
             assert hasattr(mlxcli, "__version__"), "Missing __version__"
             assert isinstance(mlxcli.__version__, str), "__version__ should be string"
         finally:
@@ -140,15 +144,17 @@ class TestReadme:
         """README.md should have Quick Start section."""
         readme_path = Path(__file__).parent.parent / "README.md"
         content = readme_path.read_text()
-        assert "Quick Start" in content or "quick start" in content.lower(), \
-            "README should have Quick Start section"
+        assert (
+            "Quick Start" in content or "quick start" in content.lower()
+        ), "README should have Quick Start section"
 
     def test_readme_has_features(self):
         """README.md should have Features section."""
         readme_path = Path(__file__).parent.parent / "README.md"
         content = readme_path.read_text()
-        assert "Features" in content or "features" in content.lower(), \
-            "README should have Features section"
+        assert (
+            "Features" in content or "features" in content.lower()
+        ), "README should have Features section"
 
 
 class TestClaudeMarkdown:
@@ -166,10 +172,12 @@ class TestClaudeMarkdown:
         assert len(content) > 100, "CLAUDE.md should have substantive content"
         # Check for typical development guide sections
         lower_content = content.lower()
-        has_sections = any([
-            "architecture" in lower_content,
-            "development" in lower_content,
-            "setup" in lower_content,
-            "testing" in lower_content,
-        ])
+        has_sections = any(
+            [
+                "architecture" in lower_content,
+                "development" in lower_content,
+                "setup" in lower_content,
+                "testing" in lower_content,
+            ]
+        )
         assert has_sections, "CLAUDE.md should have development guide sections"

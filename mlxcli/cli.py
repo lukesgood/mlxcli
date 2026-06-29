@@ -1,14 +1,13 @@
 """CLI - Interactive REPL interface for MLX-CLI."""
 
 import re
-import sys
 from pathlib import Path
 from typing import Optional, Tuple
 
 from mlxcli.config import Config
-from mlxcli.session import Session
 from mlxcli.context import ProjectContext
 from mlxcli.llm import MLXBackend
+from mlxcli.session import Session
 from mlxcli.tool_registry import ToolRegistry
 from mlxcli.utils import get_project_root
 

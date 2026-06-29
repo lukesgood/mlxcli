@@ -1,6 +1,7 @@
 """ToolRegistry - central tool registration and dispatch system."""
 
-from typing import Optional, Dict
+from typing import Dict, Optional
+
 from mlxcli.tools.base import Tool
 
 

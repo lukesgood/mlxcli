@@ -1,9 +1,10 @@
 """Tests for MLXBackend - MLX model loading and inference."""
 
-import pytest
 import sys
 from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
+
+import pytest
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -43,7 +44,9 @@ class TestMLXBackendCreation:
         """current_model_name should be a string (or None)."""
         backend = MLXBackend()
 
-        assert backend.current_model_name is None or isinstance(backend.current_model_name, str)
+        assert backend.current_model_name is None or isinstance(
+            backend.current_model_name, str
+        )
 
 
 class TestMLXBackendAvailableModels:
@@ -75,7 +78,7 @@ class TestMLXBackendAvailableModels:
         backend = MLXBackend()
 
         # Patch _check_mlx to return False
-        with patch.object(backend, '_check_mlx', return_value=False):
+        with patch.object(backend, "_check_mlx", return_value=False):
             models = backend.get_available_models()
 
         assert isinstance(models, list)
@@ -85,7 +88,7 @@ class TestMLXBackendAvailableModels:
         backend = MLXBackend()
 
         # Patch _check_mlx to return True
-        with patch.object(backend, '_check_mlx', return_value=True):
+        with patch.object(backend, "_check_mlx", return_value=True):
             models = backend.get_available_models()
 
         assert isinstance(models, list)
@@ -113,7 +116,7 @@ class TestMLXBackendLoadModel:
         backend = MLXBackend()
 
         # Patch _check_mlx to return False
-        with patch.object(backend, '_check_mlx', return_value=False):
+        with patch.object(backend, "_check_mlx", return_value=False):
             result = backend.load_model("meta-llama/Llama-2-7b-hf")
 
         assert result is False
@@ -144,7 +147,9 @@ class TestMLXBackendLoadModel:
         backend.load_model("meta-llama/Llama-2-7b-hf")
 
         # Should be the model name or None, not uninitialized
-        assert backend.current_model_name is None or isinstance(backend.current_model_name, str)
+        assert backend.current_model_name is None or isinstance(
+            backend.current_model_name, str
+        )
 
     def test_can_set_model_name_explicitly(self):
         """Should be able to set current_model_name."""
@@ -166,7 +171,7 @@ class TestMLXBackendGenerate:
         backend.model = Mock()
         backend.tokenizer = Mock()
 
-        with patch('mlxcli.llm.generate', return_value="Generated text"):
+        with patch("mlxcli.llm.generate", return_value="Generated text"):
             result = backend.generate("What is AI?")
 
         assert isinstance(result, str)
@@ -185,13 +190,13 @@ class TestMLXBackendGenerate:
         backend.model = Mock()
         backend.tokenizer = Mock()
 
-        with patch('mlxcli.llm.generate', return_value="Generated text"):
+        with patch("mlxcli.llm.generate", return_value="Generated text"):
             result = backend.generate(
                 "What is AI?",
                 messages=[
                     {"role": "user", "content": "Hello"},
-                    {"role": "assistant", "content": "Hi!"}
-                ]
+                    {"role": "assistant", "content": "Hi!"},
+                ],
             )
 
         assert isinstance(result, str)
@@ -203,11 +208,9 @@ class TestMLXBackendGenerate:
         backend.model = Mock()
         backend.tokenizer = Mock()
 
-        tools = [
-            {"name": "calculator", "description": "A calculator tool"}
-        ]
+        tools = [{"name": "calculator", "description": "A calculator tool"}]
 
-        with patch('mlxcli.llm.generate', return_value="Generated text"):
+        with patch("mlxcli.llm.generate", return_value="Generated text"):
             result = backend.generate("What is 2+2?", tools=tools)
 
         assert isinstance(result, str)
@@ -219,7 +222,7 @@ class TestMLXBackendGenerate:
         backend.model = Mock()
         backend.tokenizer = Mock()
 
-        with patch('mlxcli.llm.generate', return_value="Generated text"):
+        with patch("mlxcli.llm.generate", return_value="Generated text"):
             result = backend.generate("What is AI?", max_tokens=256)
 
         assert isinstance(result, str)
@@ -231,7 +234,7 @@ class TestMLXBackendGenerate:
         backend.model = Mock()
         backend.tokenizer = Mock()
 
-        with patch('mlxcli.llm.generate', return_value="Generated text"):
+        with patch("mlxcli.llm.generate", return_value="Generated text"):
             result = backend.generate("Test prompt")
 
         assert isinstance(result, str)
@@ -243,12 +246,12 @@ class TestMLXBackendGenerate:
         backend.model = Mock()
         backend.tokenizer = Mock()
 
-        with patch('mlxcli.llm.generate', return_value="Generated response"):
+        with patch("mlxcli.llm.generate", return_value="Generated response"):
             result = backend.generate(
                 prompt="What is AI?",
                 messages=[{"role": "user", "content": "Hello"}],
                 tools=[{"name": "tool1", "description": "A tool"}],
-                max_tokens=512
+                max_tokens=512,
             )
 
         assert isinstance(result, str)
@@ -365,7 +368,7 @@ class TestMLXBackendErrorMessages:
         """load_model should indicate when MLX is not installed."""
         backend = MLXBackend()
 
-        with patch.object(backend, '_check_mlx', return_value=False):
+        with patch.object(backend, "_check_mlx", return_value=False):
             backend.load_model("meta-llama/Llama-2-7b-hf")
 
         captured = capsys.readouterr()
@@ -377,7 +380,7 @@ class TestMLXBackendGracefulHandling:
 
     def test_backend_works_without_mlx_installed(self):
         """Backend should work gracefully even if MLX is not installed."""
-        with patch('mlxcli.llm.mlx_available', False):
+        with patch("mlxcli.llm.mlx_available", False):
             backend = MLXBackend()
 
         # Should still be able to create instance
@@ -387,7 +390,7 @@ class TestMLXBackendGracefulHandling:
         """get_available_models should return empty list without MLX."""
         backend = MLXBackend()
 
-        with patch.object(backend, '_check_mlx', return_value=False):
+        with patch.object(backend, "_check_mlx", return_value=False):
             models = backend.get_available_models()
 
         assert isinstance(models, list)
@@ -396,7 +399,7 @@ class TestMLXBackendGracefulHandling:
         """load_model should return False without MLX."""
         backend = MLXBackend()
 
-        with patch.object(backend, '_check_mlx', return_value=False):
+        with patch.object(backend, "_check_mlx", return_value=False):
             result = backend.load_model("meta-llama/Llama-2-7b-hf")
 
         assert result is False
@@ -437,7 +440,7 @@ class TestMLXBackendIntegration:
         backend.current_model_name = "test-model"
 
         # Generate text
-        with patch('mlxcli.llm.generate', return_value="Generated text"):
+        with patch("mlxcli.llm.generate", return_value="Generated text"):
             result = backend.generate("Test prompt")
         assert isinstance(result, str)
 

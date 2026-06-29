@@ -1,9 +1,10 @@
 """Tests for abstract Tool base class."""
 
-import pytest
-from abc import ABC, abstractmethod
-from pathlib import Path
 import sys
+from abc import ABC
+from pathlib import Path
+
+import pytest
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -30,6 +31,7 @@ class TestToolRequiredProperties:
     def test_tool_requires_name_property(self):
         """Tool should require implementing name property."""
         with pytest.raises(TypeError):
+
             class IncompleteToolNoName(Tool):
                 @property
                 def description(self) -> str:
@@ -43,6 +45,7 @@ class TestToolRequiredProperties:
     def test_tool_requires_description_property(self):
         """Tool should require implementing description property."""
         with pytest.raises(TypeError):
+
             class IncompleteToolNoDescription(Tool):
                 @property
                 def name(self) -> str:
@@ -60,6 +63,7 @@ class TestToolRequiredMethods:
     def test_tool_requires_execute_method(self):
         """Tool should require implementing execute method."""
         with pytest.raises(TypeError):
+
             class IncompleteToolNoExecute(Tool):
                 @property
                 def name(self) -> str:
@@ -77,6 +81,7 @@ class TestConcreteToolImplementation:
 
     def test_can_create_concrete_tool(self):
         """Should be able to create a concrete Tool implementation."""
+
         class SimpleTool(Tool):
             @property
             def name(self) -> str:
@@ -95,6 +100,7 @@ class TestConcreteToolImplementation:
 
     def test_concrete_tool_has_name_property(self):
         """Concrete tool should have accessible name property."""
+
         class SimpleTool(Tool):
             @property
             def name(self) -> str:
@@ -113,6 +119,7 @@ class TestConcreteToolImplementation:
 
     def test_concrete_tool_has_description_property(self):
         """Concrete tool should have accessible description property."""
+
         class SimpleTool(Tool):
             @property
             def name(self) -> str:
@@ -135,6 +142,7 @@ class TestConcreteToolExecute:
 
     def test_concrete_tool_execute_works(self):
         """Concrete tool execute should work and return dict with status."""
+
         class SimpleTool(Tool):
             @property
             def name(self) -> str:
@@ -155,6 +163,7 @@ class TestConcreteToolExecute:
 
     def test_concrete_tool_execute_with_arguments(self):
         """Concrete tool execute should receive and process arguments."""
+
         class EchoTool(Tool):
             @property
             def name(self) -> str:
@@ -175,6 +184,7 @@ class TestConcreteToolExecute:
 
     def test_concrete_tool_execute_error_status(self):
         """Concrete tool execute can return error status."""
+
         class ErrorTool(Tool):
             @property
             def name(self) -> str:
@@ -198,6 +208,7 @@ class TestMultipleToolImplementations:
 
     def test_two_different_tool_implementations(self):
         """Should be able to create multiple different Tool implementations."""
+
         class Tool1(Tool):
             @property
             def name(self) -> str:
@@ -232,6 +243,7 @@ class TestMultipleToolImplementations:
 
     def test_tool_implementation_with_state(self):
         """Tool implementation can maintain state."""
+
         class StatefulTool(Tool):
             def __init__(self):
                 self._call_count = 0
@@ -259,6 +271,7 @@ class TestMultipleToolImplementations:
 
     def test_tool_implementation_with_initialization(self):
         """Tool implementation can have custom initialization."""
+
         class ConfigurableTool(Tool):
             def __init__(self, prefix: str = "tool"):
                 self._prefix = prefix
@@ -288,6 +301,7 @@ class TestToolInterface:
 
     def test_name_is_property_not_method(self):
         """name should be a property, not a method."""
+
         class TestTool(Tool):
             @property
             def name(self) -> str:
@@ -306,6 +320,7 @@ class TestToolInterface:
 
     def test_description_is_property_not_method(self):
         """description should be a property, not a method."""
+
         class TestTool(Tool):
             @property
             def name(self) -> str:
@@ -324,6 +339,7 @@ class TestToolInterface:
 
     def test_execute_takes_dict_argument(self):
         """execute should accept dict argument."""
+
         class TestTool(Tool):
             @property
             def name(self) -> str:
@@ -342,6 +358,7 @@ class TestToolInterface:
 
     def test_execute_returns_dict(self):
         """execute should return dict."""
+
         class TestTool(Tool):
             @property
             def name(self) -> str:

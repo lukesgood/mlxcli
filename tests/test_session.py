@@ -1,20 +1,19 @@
 """Tests for Session - conversation state management and persistence."""
 
-import pytest
 import json
+import shutil
+import stat
 import sys
 import tempfile
-import shutil
-import os
-import stat
-from pathlib import Path
 from datetime import datetime
+from pathlib import Path
+
+import pytest
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from mlxcli.session import Session
-from mlxcli.utils import get_project_root, ensure_project_root_dir
 
 
 class TestSessionCreation:
@@ -143,7 +142,11 @@ class TestSessionMessages:
         """tools_called can be set when adding message."""
         session = Session(model="test", working_directory="/tmp")
         tools_called = [
-            {"name": "file_read", "args": {"path": "/tmp/test.txt"}, "result": "content"}
+            {
+                "name": "file_read",
+                "args": {"path": "/tmp/test.txt"},
+                "result": "content",
+            }
         ]
 
         session.add_message(role="assistant", content="test", tools_called=tools_called)
@@ -304,13 +307,17 @@ class TestSessionPersistence:
         sessions_dir = temp_project / ".mlxcli" / "sessions"
 
         # Create with all fields
-        original = Session(model="claude-3-opus", working_directory="/home/user/projects")
+        original = Session(
+            model="claude-3-opus", working_directory="/home/user/projects"
+        )
         original.context = {"files_referenced": ["file1.py", "file2.py"]}
         original.add_message(
             role="user",
             content="Can you help?",
             tools_used=["grep"],
-            tools_called=[{"name": "grep", "args": {"pattern": "test"}, "result": "matches"}],
+            tools_called=[
+                {"name": "grep", "args": {"pattern": "test"}, "result": "matches"}
+            ],
         )
         original.add_message(role="assistant", content="Sure!", tools_used=[])
 
@@ -368,6 +375,7 @@ class TestSessionPersistence:
             if i < 2:
                 # Small delay to ensure different timestamps
                 import time
+
                 time.sleep(0.01)
 
         # List sessions

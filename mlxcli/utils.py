@@ -1,9 +1,8 @@
 """Utility functions for MLX-CLI."""
 
-from pathlib import Path
-import os
-from typing import Optional
 import fnmatch
+from pathlib import Path
+from typing import Optional
 
 
 def get_project_root(start_path: Optional[Path] = None) -> Path:

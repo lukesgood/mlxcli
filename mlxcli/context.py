@@ -1,8 +1,8 @@
 """ProjectContext - auto-discovery of project structure and metadata."""
 
-from pathlib import Path
-from typing import Optional, Dict, Any
 from functools import cached_property
+from pathlib import Path
+from typing import Any, Dict, Optional
 
 from mlxcli.utils import get_project_root, should_ignore_path
 
@@ -20,7 +20,14 @@ class ProjectContext:
     """
 
     # Default directories to always ignore
-    DEFAULT_IGNORE_DIRS = {".git", ".mlxcli", "__pycache__", ".pytest_cache", ".venv", "venv"}
+    DEFAULT_IGNORE_DIRS = {
+        ".git",
+        ".mlxcli",
+        "__pycache__",
+        ".pytest_cache",
+        ".venv",
+        "venv",
+    }
 
     def __init__(self, project_root: Optional[Path] = None) -> None:
         """Initialize ProjectContext.
@@ -103,7 +110,12 @@ class ProjectContext:
         return "\n".join(lines)
 
     def _build_tree(
-        self, path: Path, prefix: str, depth: int, lines: list[str], is_last: bool = True
+        self,
+        path: Path,
+        prefix: str,
+        depth: int,
+        lines: list[str],
+        is_last: bool = True,
     ) -> None:
         """Recursively build tree representation.
 
@@ -188,10 +200,13 @@ class ProjectContext:
 
         # Top-level files
         try:
-            top_level = sorted([
-                item.name for item in self._project_root.iterdir()
-                if item.is_file() and not item.name.startswith(".")
-            ])
+            top_level = sorted(
+                [
+                    item.name
+                    for item in self._project_root.iterdir()
+                    if item.is_file() and not item.name.startswith(".")
+                ]
+            )
             metadata["top_level_files"] = top_level
         except (PermissionError, OSError):
             metadata["top_level_files"] = []
@@ -212,10 +227,9 @@ class ProjectContext:
 
         # Directory checks
         metadata["has_src"] = (self._project_root / "src").is_dir()
-        metadata["has_tests"] = (
-            (self._project_root / "tests").is_dir() or
-            (self._project_root / "test").is_dir()
-        )
+        metadata["has_tests"] = (self._project_root / "tests").is_dir() or (
+            self._project_root / "test"
+        ).is_dir()
 
         return metadata
 

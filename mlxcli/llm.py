@@ -1,11 +1,12 @@
 """MLXBackend - MLX model loading and inference backend."""
 
-from typing import Optional, Any
+from typing import Any, Optional
 
 # Check if MLX is available
 try:
     import mlx.core as mx
-    from mlx_lm import load, generate
+    from mlx_lm import generate, load
+
     mlx_available = True
 except ImportError:
     mlx_available = False
@@ -64,17 +65,17 @@ class MLXBackend:
             {
                 "name": "meta-llama/Llama-2-7b-hf",
                 "size": "~7GB",
-                "description": "Llama 2 7B (good for most use cases)"
+                "description": "Llama 2 7B (good for most use cases)",
             },
             {
                 "name": "mistral-community/Mistral-7B-v0.1",
                 "size": "~7GB",
-                "description": "Mistral 7B (fast, good quality)"
+                "description": "Mistral 7B (fast, good quality)",
             },
             {
                 "name": "meta-llama/Llama-2-13b-hf",
                 "size": "~13GB",
-                "description": "Llama 2 13B (larger, higher quality)"
+                "description": "Llama 2 13B (larger, higher quality)",
             },
         ]
 
@@ -113,7 +114,7 @@ class MLXBackend:
         prompt: str,
         messages: Optional[list] = None,
         tools: Optional[list[dict]] = None,
-        max_tokens: int = 512
+        max_tokens: int = 512,
     ) -> str:
         """Generate text using the loaded model.
 
@@ -146,7 +147,7 @@ class MLXBackend:
             self.tokenizer,
             prompt=full_prompt,
             max_tokens=max_tokens,
-            verbose=False
+            verbose=False,
         )
 
         return response
@@ -182,7 +183,7 @@ class MLXBackend:
         self,
         prompt: str,
         messages: Optional[list] = None,
-        tools: Optional[list[dict]] = None
+        tools: Optional[list[dict]] = None,
     ) -> str:
         """Build full prompt from components.
 

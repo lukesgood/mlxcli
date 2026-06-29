@@ -1,18 +1,15 @@
 """Tests for main.py - Typer CLI entry point."""
 
-import sys
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
-from unittest.mock import patch, MagicMock
-
-import pytest
+from unittest.mock import MagicMock, patch
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from mlxcli.main import app
-from mlxcli.cli import CLI
 
 
 class TestMainApp:
@@ -25,6 +22,7 @@ class TestMainApp:
     def test_app_is_typer_app(self):
         """app should be a Typer application."""
         import typer
+
         assert isinstance(app, typer.Typer)
 
     def test_main_command_exists(self):
@@ -111,6 +109,7 @@ class TestMainCommand:
     def test_main_has_docstring(self):
         """main function should have a docstring."""
         from mlxcli import main
+
         # Get the main function from the app
         assert main.__doc__ is not None or len(main.__doc__) > 0
 
@@ -121,6 +120,7 @@ class TestMainModule:
     def test_main_module_can_be_imported(self):
         """__main__.py should be importable."""
         from mlxcli import __main__
+
         assert __main__ is not None
 
     def test_main_module_runs_without_error(self):

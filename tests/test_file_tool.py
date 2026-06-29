@@ -1,19 +1,20 @@
 """Tests for FileTool - file operations with auto-backup."""
 
-import pytest
-from pathlib import Path
+import os
+import shutil
 import sys
 import tempfile
-import shutil
-import os
+from pathlib import Path
+
+import pytest
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from mlxcli.tools.file_tool import FileTool
 from mlxcli.utils import (
-    get_project_root,
     ensure_project_root_dir,
+    get_project_root,
     is_within_project,
     should_ignore_path,
 )
@@ -41,6 +42,7 @@ class TestFileTool:
             return temp_project
 
         import mlxcli.tools.file_tool as ft_module
+
         ft_module.get_project_root = mock_get_project_root
 
         yield FileTool()
@@ -74,7 +76,9 @@ class TestFileTool:
         # Compare resolved paths to handle symlink/realpath differences on macOS
         assert Path(result["path"]).resolve() == test_file.resolve()
 
-    def test_file_tool_returns_error_for_nonexistent_file(self, temp_project, file_tool):
+    def test_file_tool_returns_error_for_nonexistent_file(
+        self, temp_project, file_tool
+    ):
         """FileTool returns error for non-existent files."""
         nonexistent = temp_project / "nonexistent.txt"
 
@@ -102,7 +106,9 @@ class TestFileTool:
         assert backup_file.exists()
         assert backup_file.read_text() == original_content
 
-    def test_file_tool_can_create_new_files_without_backup(self, temp_project, file_tool):
+    def test_file_tool_can_create_new_files_without_backup(
+        self, temp_project, file_tool
+    ):
         """FileTool can create new files without backup."""
         new_file = temp_project / "new.txt"
         content = "New file content"
@@ -160,7 +166,9 @@ class TestFileTool:
         assert result["status"] == "error"
         assert "message" in result
 
-    def test_file_tool_handles_permission_errors_gracefully(self, temp_project, file_tool):
+    def test_file_tool_handles_permission_errors_gracefully(
+        self, temp_project, file_tool
+    ):
         """FileTool handles permission errors gracefully."""
         # Create a file and remove read permissions
         test_file = temp_project / "readonly.txt"

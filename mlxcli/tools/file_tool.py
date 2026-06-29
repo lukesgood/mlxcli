@@ -2,7 +2,6 @@
 
 from pathlib import Path
 from typing import Optional
-import os
 
 from mlxcli.tools.base import Tool
 from mlxcli.utils import get_project_root, is_within_project, should_ignore_path
@@ -109,7 +108,10 @@ class FileTool(Tool):
         if path is None:
             return {"status": "error", "message": "path is required for write action"}
         if content is None:
-            return {"status": "error", "message": "content is required for write action"}
+            return {
+                "status": "error",
+                "message": "content is required for write action",
+            }
 
         try:
             file_path = Path(path).resolve()
@@ -137,7 +139,9 @@ class FileTool(Tool):
             file_path.write_text(content)
 
             # If it's a session file, set secure permissions (chmod 600)
-            if file_path.name.endswith(".session.json") or ".sessions/" in str(file_path):
+            if file_path.name.endswith(".session.json") or ".sessions/" in str(
+                file_path
+            ):
                 file_path.chmod(0o600)
 
             return {
@@ -168,7 +172,10 @@ class FileTool(Tool):
             dict: {"status": "ok", "path": str, "files": [str], "dirs": [str]} or error dict.
         """
         if path is None:
-            return {"status": "error", "message": "path is required for list_dir action"}
+            return {
+                "status": "error",
+                "message": "path is required for list_dir action",
+            }
 
         try:
             dir_path = Path(path).resolve()

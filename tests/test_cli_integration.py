@@ -1,22 +1,19 @@
 """Tests for CLI - REPL loop and command handling."""
 
-import pytest
 import sys
 import tempfile
-import json
-from pathlib import Path
 from io import StringIO
-from unittest.mock import MagicMock, patch, call
-from datetime import datetime
+from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 # Add project root to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from mlxcli.cli import CLI
 from mlxcli.config import Config
-from mlxcli.session import Session
 from mlxcli.context import ProjectContext
 from mlxcli.llm import MLXBackend
+from mlxcli.session import Session
 from mlxcli.tool_registry import ToolRegistry
 from mlxcli.utils import get_project_root
 
@@ -169,10 +166,7 @@ class TestCLICommands:
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CLI(project_root=Path(tmpdir))
             # Create a session with a model
-            cli.session = Session(
-                model="test-model",
-                working_directory=str(tmpdir)
-            )
+            cli.session = Session(model="test-model", working_directory=str(tmpdir))
 
             with patch("sys.stdout", new_callable=StringIO) as mock_stdout:
                 result = cli._handle_command("model")
@@ -195,10 +189,7 @@ class TestCLICommands:
         """_handle_command should save session for /save."""
         with tempfile.TemporaryDirectory() as tmpdir:
             cli = CLI(project_root=Path(tmpdir))
-            cli.session = Session(
-                model="test-model",
-                working_directory=str(tmpdir)
-            )
+            cli.session = Session(model="test-model", working_directory=str(tmpdir))
 
             result = cli._handle_command("save")
 
@@ -228,11 +219,7 @@ class TestCLIModelSelection:
             # Mock the backend to return models
             cli.backend.get_available_models = MagicMock(
                 return_value=[
-                    {
-                        "name": "model1",
-                        "size": "7GB",
-                        "description": "Test model 1"
-                    }
+                    {"name": "model1", "size": "7GB", "description": "Test model 1"}
                 ]
             )
             # Also mock load_model to return True
@@ -342,11 +329,7 @@ class TestCLIIntegration:
             # Mock the backend
             cli.backend.get_available_models = MagicMock(
                 return_value=[
-                    {
-                        "name": "test-model",
-                        "size": "7GB",
-                        "description": "Test model"
-                    }
+                    {"name": "test-model", "size": "7GB", "description": "Test model"}
                 ]
             )
             cli.backend.load_model = MagicMock(return_value=True)

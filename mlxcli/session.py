@@ -1,16 +1,14 @@
 """Session management for conversation state and persistence."""
 
 import json
-import os
-import stat
 import random
 import string
-from pathlib import Path
+from dataclasses import dataclass, field
 from datetime import datetime
-from dataclasses import dataclass, field, asdict
+from pathlib import Path
 from typing import Optional
 
-from mlxcli.utils import get_project_root, ensure_project_root_dir
+from mlxcli.utils import get_project_root
 
 
 @dataclass
@@ -30,7 +28,11 @@ class Session:
 
     model: str
     working_directory: str
-    id: str = field(default_factory=lambda: ''.join(random.choices(string.ascii_letters + string.digits, k=8)))
+    id: str = field(
+        default_factory=lambda: "".join(
+            random.choices(string.ascii_letters + string.digits, k=8)
+        )
+    )
     created_at: datetime = field(default_factory=datetime.now)
     updated_at: datetime = field(default_factory=datetime.now)
     messages: list = field(default_factory=list)
