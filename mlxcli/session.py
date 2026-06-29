@@ -182,6 +182,30 @@ class Session:
         return sessions
 
     @staticmethod
+    def recover_corrupted(
+        session_id: str, sessions_dir: Optional[Path] = None
+    ) -> "Session":
+        """Recover from a corrupted session by creating a new session.
+
+        Creates a new session with the same session_id. The corrupted session
+        file is not deleted, allowing manual recovery if needed. This method
+        is useful when a session file is corrupted and cannot be loaded.
+
+        Args:
+            session_id: The ID of the corrupted session.
+            sessions_dir: Path to sessions directory. If None, uses default.
+
+        Returns:
+            A new Session instance with the same session_id.
+        """
+        # Create a new session with the given ID
+        session = Session(model="claude-3-sonnet", working_directory="/")
+        # Override the auto-generated ID with the provided one
+        session.id = session_id
+
+        return session
+
+    @staticmethod
     def _get_default_sessions_dir() -> Path:
         """Get default sessions directory path.
 

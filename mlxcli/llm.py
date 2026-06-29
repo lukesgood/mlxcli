@@ -2,6 +2,8 @@
 
 from typing import Any, Optional
 
+from mlxcli.error_handler import ErrorHandler
+
 # Check if MLX is available
 try:
     import mlx.core as mx
@@ -36,6 +38,7 @@ class MLXBackend:
         self.tokenizer: Optional[Any] = None
         self.current_model_name: Optional[str] = None
         self._mlx_available = mlx_available
+        self.error_handler = ErrorHandler()
 
     def _check_mlx(self) -> bool:
         """Check if MLX is available and installed.
@@ -136,7 +139,14 @@ class MLXBackend:
             RuntimeError: If no model is loaded.
         """
         if self.model is None:
-            raise RuntimeError("No model loaded. Call load_model() first.")
+            # Use error handler to provide actionable suggestion
+            error_result = self.error_handler.handle_error(
+                "model_not_found",
+                {"model_name": self.current_model_name or "unknown"},
+            )
+            raise RuntimeError(
+                f"{error_result['error']}. {error_result['suggestion']}"
+            )
 
         # Build full prompt from components
         full_prompt = self._build_prompt(prompt, messages, tools)

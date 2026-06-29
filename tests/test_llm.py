@@ -361,7 +361,7 @@ class TestMLXBackendErrorMessages:
         """generate should provide informative error when no model loaded."""
         backend = MLXBackend()
 
-        with pytest.raises(RuntimeError, match="[Nn]o model"):
+        with pytest.raises(RuntimeError, match="[Mm]odel.*not found"):
             backend.generate("Test prompt")
 
     def test_load_model_without_mlx_message(self, capsys):
