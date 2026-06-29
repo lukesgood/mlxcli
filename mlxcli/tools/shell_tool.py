@@ -16,6 +16,9 @@ class ShellTool(Tool):
     - Captures stdout and stderr
     - Preview mode to check commands before execution
     - Command validation for syntax errors
+
+    Security Note: Uses shell=True to support pipes, redirects, and complex shell features.
+    This is intentional and mitigated by pre-execution validation against dangerous patterns.
     """
 
     DEFAULT_TIMEOUT = 30
