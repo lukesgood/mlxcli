@@ -189,6 +189,101 @@ class MLXBackend:
         # Approximation: ~1 token per 4 characters
         return max(1, len(text) // 4)
 
+    def get_model_info(self) -> dict:
+        """Get current model information.
+
+        Returns information about the currently loaded model, including
+        its name, status (loaded/not loaded), context window, and size.
+
+        Returns:
+            dict: Model information with keys:
+            - status: "ok" if model loaded, "no_model" if not loaded
+            - name: Model name (if loaded)
+            - context: Context window size in tokens (if loaded)
+            - size: Approximate model size as string (if loaded)
+        """
+        if self.model is None or self.current_model_name is None:
+            return {"status": "no_model"}
+
+        # Get model details from available models list
+        available_models = self.get_available_models()
+        model_details = None
+
+        for model in available_models:
+            if model["name"] == self.current_model_name:
+                model_details = model
+                break
+
+        # Default context window and size if model not found in list
+        if model_details:
+            size = model_details.get("size", "~7GB")
+            # Extract numeric context based on model name
+            context = self._estimate_context_window(self.current_model_name)
+        else:
+            size = "~7GB"
+            context = self._estimate_context_window(self.current_model_name)
+
+        return {
+            "status": "ok",
+            "name": self.current_model_name,
+            "context": context,
+            "size": size,
+        }
+
+    def get_model_details(self, model_name: str) -> dict:
+        """Get details about a specific model.
+
+        Looks up a model by name and returns its details including
+        description and size. Returns "not_found" status if model
+        doesn't exist in the available models list.
+
+        Args:
+            model_name: Name of the model to look up.
+
+        Returns:
+            dict: Model details with keys:
+            - status: "ok" if found, "not_found" if not found
+            - name: Model name (if found)
+            - description: Human-readable description (if found)
+            - size: Approximate model size (if found)
+        """
+        available_models = self.get_available_models()
+
+        for model in available_models:
+            if model["name"] == model_name:
+                return {
+                    "status": "ok",
+                    "name": model["name"],
+                    "description": model.get("description", ""),
+                    "size": model.get("size", "Unknown"),
+                }
+
+        return {"status": "not_found"}
+
+    def _estimate_context_window(self, model_name: str) -> int:
+        """Estimate context window size from model name.
+
+        Uses heuristics to estimate context window based on model name.
+        Default is 4096 tokens (2k context).
+
+        Args:
+            model_name: Name of the model.
+
+        Returns:
+            int: Estimated context window in tokens.
+        """
+        # Common model context windows
+        if "13b" in model_name.lower():
+            return 4096
+        elif "7b" in model_name.lower():
+            return 4096
+        elif "70b" in model_name.lower():
+            return 4096
+        elif "3b" in model_name.lower():
+            return 2048
+        else:
+            return 4096
+
     def _build_prompt(
         self,
         prompt: str,
