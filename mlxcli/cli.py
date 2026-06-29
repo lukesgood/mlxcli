@@ -218,7 +218,7 @@ class CLI:
 
         Supported commands:
         - help: Show help text
-        - model: Show current model
+        - model: Show current model or subcommands (list, switch)
         - sessions: List saved sessions
         - save: Manually save session
         - exit: Exit the CLI
@@ -235,11 +235,7 @@ class CLI:
             return True
 
         elif cmd == "model":
-            if self.session:
-                print(f"Current model: {self.session.model}")
-            else:
-                print("No session active.")
-            return True
+            return self._handle_model_command(args)
 
         elif cmd == "sessions":
             self._list_sessions()
@@ -260,17 +256,117 @@ class CLI:
             print(f"Unknown command: /{cmd}. Type '/help' for available commands.")
             return True
 
+    def _handle_model_command(self, args: str) -> bool:
+        """Route /model subcommands.
+
+        Supported subcommands:
+        - (no args): Show current model info
+        - list: List available models
+        - switch <name>: Switch to different model
+
+        Args:
+            args: Subcommand and arguments.
+
+        Returns:
+            bool: True to continue REPL loop.
+        """
+        if not args or args.strip() == "":
+            # No args - show current model info
+            self._model_info_command()
+            return True
+
+        parts = args.split(maxsplit=1)
+        subcommand = parts[0].lower()
+
+        if subcommand == "list":
+            self._list_models_command()
+            return True
+
+        elif subcommand == "switch":
+            if len(parts) < 2:
+                print("Usage: /model switch <model_name>")
+                return True
+            model_name = parts[1]
+            self._switch_model_command(model_name)
+            return True
+
+        else:
+            print(f"Unknown model subcommand: {subcommand}")
+            print("Usage: /model [list|switch <name>]")
+            return True
+
+    def _model_info_command(self) -> None:
+        """Show current model info.
+
+        Displays information about the currently loaded model including
+        its name, status, context window, and size.
+        """
+        model_info = self.backend.get_model_info()
+
+        if model_info["status"] == "no_model":
+            print("📊 No model loaded")
+            return
+
+        # Format and display model info
+        name = model_info.get("name", "Unknown")
+        context = model_info.get("context", 0)
+        size = model_info.get("size", "Unknown")
+
+        print(f"📊 Current Model: {name}")
+        print(f"   Status: Loaded")
+        print(f"   Context: {context} tokens")
+        print(f"   Size: {size}")
+
+    def _list_models_command(self) -> None:
+        """List available models.
+
+        Displays all available models with descriptions and sizes.
+        """
+        models = self.backend.get_available_models()
+
+        if not models:
+            print("📦 No models available")
+            return
+
+        print("📦 Available Models:")
+        for i, model in enumerate(models, 1):
+            name = model.get("name", "Unknown")
+            description = model.get("description", "")
+            size = model.get("size", "Unknown")
+
+            print(f"  {i}. {name}")
+            print(f"     {description}")
+            print(f"     Size: {size}")
+
+    def _switch_model_command(self, model_name: str) -> None:
+        """Switch to different model.
+
+        Attempts to load a new model and update the current session.
+        Continues the session with the new model.
+
+        Args:
+            model_name: Name of the model to switch to.
+        """
+        if self.backend.load_model(model_name):
+            if self.session:
+                self.session.model = model_name
+            print(f"✓ Switched to {model_name}")
+        else:
+            print(f"✗ Failed to load {model_name}")
+
     def _print_help(self) -> None:
         """Print help text with available commands."""
         help_text = """
 MLX-CLI Commands:
 ================
 
-  /help        Show this help message
-  /model       Show current model
-  /sessions    List saved sessions
-  /save        Manually save the current session
-  /exit        Exit the CLI
+  /help              Show this help message
+  /model             Show current model info
+  /model list        List available models
+  /model switch NAME Switch to different model
+  /sessions          List saved sessions
+  /save              Manually save the current session
+  /exit              Exit the CLI
 
 Regular text will be sent to the AI model for response.
 Use @filename syntax to reference files (phase 2 feature).
