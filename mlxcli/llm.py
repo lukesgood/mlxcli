@@ -2,6 +2,7 @@
 
 from typing import Any, Optional
 
+from mlxcli.context_manager import ContextManager
 from mlxcli.error_handler import ErrorHandler
 
 # Check if MLX is available
@@ -39,6 +40,7 @@ class MLXBackend:
         self.current_model_name: Optional[str] = None
         self._mlx_available = mlx_available
         self.error_handler = ErrorHandler()
+        self.context_manager = ContextManager()
 
     def _check_mlx(self) -> bool:
         """Check if MLX is available and installed.
@@ -146,6 +148,12 @@ class MLXBackend:
             )
             raise RuntimeError(
                 f"{error_result['error']}. {error_result['suggestion']}"
+            )
+
+        # Trim messages to fit context window
+        if messages:
+            messages = self.context_manager.trim_to_budget(
+                messages, token_budget=3500  # Leave 500 for output
             )
 
         # Build full prompt from components

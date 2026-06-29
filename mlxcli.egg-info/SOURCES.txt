@@ -3,6 +3,7 @@ pyproject.toml
 mlxcli/__init__.py
 mlxcli/__main__.py
 mlxcli/cli.py
+mlxcli/completion.py
 mlxcli/config.py
 mlxcli/context.py
 mlxcli/error_handler.py
@@ -23,13 +24,16 @@ mlxcli/tools/file_tool.py
 mlxcli/tools/shell_tool.py
 tests/test_base_tool.py
 tests/test_cli_integration.py
+tests/test_completion.py
 tests/test_context.py
 tests/test_error_handler.py
 tests/test_file_tool.py
 tests/test_integration.py
 tests/test_llm.py
 tests/test_main.py
+tests/test_model_commands.py
 tests/test_project_setup.py
 tests/test_session.py
+tests/test_session_commands.py
 tests/test_shell_tool.py
 tests/test_tool_registry.py
