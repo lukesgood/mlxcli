@@ -4,6 +4,9 @@ import re
 from pathlib import Path
 from typing import Optional, Tuple
 
+from prompt_toolkit import PromptSession
+
+from mlxcli.completion import setup_completion
 from mlxcli.config import Config
 from mlxcli.context import ProjectContext
 from mlxcli.llm import MLXBackend
@@ -148,14 +151,20 @@ class CLI:
         - Regular conversation
         - KeyboardInterrupt (Ctrl+C)
         - Auto-save on exit
+        - Tab completion for commands and files
         """
         print("Type '/help' for commands, or start typing to chat.")
-        print("Press Ctrl+C or type '/exit' to quit.\n")
+        print("Press Ctrl+C or type '/exit' to quit.")
+        print("Use Tab for completion of commands and files.\n")
+
+        # Setup completion for REPL
+        completer = setup_completion(self.project_root)
+        session = PromptSession(completer=completer)
 
         try:
             while True:
                 try:
-                    user_input = input("mlx-cli> ").strip()
+                    user_input = session.prompt("mlx-cli> ").strip()
 
                     if not user_input:
                         continue
