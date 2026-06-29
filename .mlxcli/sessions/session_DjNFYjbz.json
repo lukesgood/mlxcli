@@ -1,0 +1,20 @@
+{
+  "id": "DjNFYjbz",
+  "created_at": "2026-06-29T18:20:16.851783",
+  "updated_at": "2026-06-29T18:20:16.851784",
+  "model": "test-model",
+  "working_directory": "/private/var/folders/zg/r1xpyw0x7wz73wdwcb344n840000gn/T/tmpu1s280ck",
+  "messages": [],
+  "context": {
+    "project_root": "/private/var/folders/zg/r1xpyw0x7wz73wdwcb344n840000gn/T/tmpu1s280ck",
+    "project_type": "unknown",
+    "file_tree": "",
+    "metadata": {
+      "top_level_files": [],
+      "readme_excerpt": null,
+      "project_type": "unknown",
+      "has_src": false,
+      "has_tests": false
+    }
+  }
+}

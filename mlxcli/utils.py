@@ -1,6 +1,7 @@
 """Utility functions for MLX-CLI."""
 
 import fnmatch
+import re
 from pathlib import Path
 from typing import Optional
 
@@ -167,5 +168,35 @@ def should_ignore_path(path: Path, project_root: Optional[Path] = None) -> bool:
                 return True
             if fnmatch.fnmatch(rel_path_str, pattern):
                 return True
+
+    return False
+
+
+def is_dangerous_command(command: str) -> bool:
+    """Check if a command is potentially dangerous and requires confirmation.
+
+    Args:
+        command: The command string to check.
+
+    Returns:
+        bool: True if the command matches dangerous patterns, False otherwise.
+    """
+    if not command:
+        return False
+
+    dangerous_patterns = [
+        r"rm\s+-rf",  # Recursive delete
+        r"git\s+push",  # Git push operations
+        r"git\s+force-push",  # Force push
+        r"dd\s+if=",  # Low-level disk operations
+        r":(){:|:&};:",  # Fork bomb
+        r"mkfs",  # Format filesystems
+        r"shred",  # Securely delete files
+        r"wipe",  # Wipe data
+    ]
+
+    for pattern in dangerous_patterns:
+        if re.search(pattern, command):
+            return True
 
     return False
