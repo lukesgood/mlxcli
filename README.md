@@ -45,31 +45,109 @@ mlx-cli> Select model (1-2) [default: 1]: 1
 mlx-cli> Ask me anything!
 ```
 
-### Example Workflows
+## Usage Guide
 
-#### 1. Analyze a Project
+### Starting an Interactive Session
+
+```bash
+# Default: start in current directory
+python -m mlxcli
+
+# Specify project root
+python -m mlxcli --root /path/to/project
+python -m mlxcli -r /path/to/project
+```
+
+### Basic Commands
+
+```bash
+mlx-cli> Hello! What can you help me with?
+# Chat normally with the LLM
+
+mlx-cli> /sessions
+# List all saved sessions
+
+mlx-cli> /load <session-id>
+# Load and resume a previous session
+
+mlx-cli> /model
+# Show available models
+
+mlx-cli> /save
+# Manually save current session
+
+mlx-cli> /exit
+# Exit the CLI
+```
+
+### File Operations
+
+Reference files in your project:
 
 ```bash
 mlx-cli> @README.md Summarize this project
+# Loads file content into context
+
+mlx-cli> @src/ Show me the structure
+# Show directory listing
+
+mlx-cli> ! python -m pytest tests/ --tb=short
+# Execute shell commands directly
 ```
 
-The CLI automatically loads the file and includes it in the conversation.
+### Example Workflows
 
-#### 2. Modify Code with Backups
+#### 1. Code Review Workflow
 
 ```bash
-mlx-cli> @src/main.py Refactor this function for clarity
+mlx-cli> @src/main.py Review this code for bugs
+# Specify file with @ prefix
+# Assistant reviews and provides feedback
+
+mlx-cli> @tests/test_main.py Are these tests comprehensive?
+# Load related test file for reference
 ```
 
-Write operations automatically create `.bak` backups before modifications.
-
-#### 3. Execute Commands
+#### 2. Project Understanding
 
 ```bash
-mlx-cli> ! python -m pytest tests/
+mlx-cli> @README.md @pyproject.toml Tell me about this project
+# Load multiple files by repeating @
+
+mlx-cli> @src/ List all Python files
+# Works with directories too
 ```
 
-Run shell commands directly and include results in your conversation.
+#### 3. Safe Modifications with Backups
+
+```bash
+mlx-cli> @src/config.py Update this config for production
+# Write operations automatically create .bak backups
+
+mlx-cli> Revert that change
+# You can recover from backups manually
+```
+
+### Session Management
+
+Sessions automatically save to `.mlxcli/sessions/`:
+
+```bash
+# List sessions
+mlx-cli> /sessions
+Available sessions:
+  abc12345 | claude-3-sonnet | 2024-06-29 10:30
+  xyz67890 | claude-3-sonnet | 2024-06-28 14:15
+
+# Resume session
+mlx-cli> /load abc12345
+
+# Each session maintains:
+# - Conversation history
+# - Tool usage logs  
+# - Project context
+# - Secure permissions (readable only by owner)
+```
 
 ## Architecture
 
@@ -159,26 +237,101 @@ Sessions are stored in `.mlxcli/sessions/` relative to your project root.
 
 ## Development
 
-See [CLAUDE.md](CLAUDE.md) for development guide, architecture details, and contribution guidelines.
+See [CLAUDE.md](CLAUDE.md) for detailed architecture, design decisions, and contribution guidelines.
+
+### Setup
+
+```bash
+# Clone and enter directory
+git clone https://github.com/mlx-cli/mlxcli.git
+cd mlxcli
+
+# Create virtual environment
+python3.10 -m venv venv
+source venv/bin/activate
+
+# Install in development mode with dependencies
+pip install -e ".[dev]"
+```
 
 ### Running Tests
 
 ```bash
+# Run all tests
 pytest tests/ -v
+
+# Run integration tests only
+pytest tests/test_integration.py -v
+
+# Run with coverage
+pytest tests/ -v --cov=mlxcli --cov-report=html
+
+# Run specific test class
+pytest tests/test_session.py::TestSessionPersistence -v
 ```
 
 ### Code Quality
 
+The project follows strict code quality standards:
+
 ```bash
-# Format code
+# Format code with black (88 char lines)
 black mlxcli tests
 
-# Lint
-ruff check mlxcli tests
+# Lint and auto-fix issues
+ruff check mlxcli tests --fix
 
-# Type check
-mypy mlxcli
+# Type checking (note: run against local code only)
+mypy mlxcli --ignore-missing-imports --python-version 3.10
 ```
+
+### Project Structure
+
+```
+mlxcli/
+├── mlxcli/
+│   ├── __init__.py           # Package metadata
+│   ├── main.py               # Entry point
+│   ├── cli.py                # REPL interface
+│   ├── session.py            # State management
+│   ├── context.py            # Project context discovery
+│   ├── llm.py                # MLX integration
+│   ├── tool_registry.py      # Tool dispatch system
+│   ├── utils.py              # Utilities and helpers
+│   ├── config.py             # Configuration
+│   └── tools/
+│       ├── base.py           # Tool interface
+│       ├── file_tool.py      # File operations
+│       └── shell_tool.py     # Shell execution
+├── tests/
+│   ├── test_*.py             # Unit tests (226 tests)
+│   └── test_integration.py   # End-to-end tests (16 tests)
+├── docs/                     # Documentation
+├── pyproject.toml            # Project config
+├── README.md                 # This file
+└── CLAUDE.md                 # Development guide
+```
+
+### Test Coverage
+
+Current test suite (242 tests):
+- **Unit tests**: 226 tests covering all components
+- **Integration tests**: 16 tests for end-to-end workflows
+- **Areas covered**:
+  - Session persistence and recovery
+  - Tool registry and execution
+  - File operations with backups
+  - Project context discovery
+  - Complex multi-operation workflows
+  - Error handling and edge cases
+
+### Version Requirements
+
+- **Python**: 3.10 or higher (3.10, 3.11, 3.12 tested)
+- **Black**: 23.0+
+- **Ruff**: 0.1.0+
+- **MyPy**: 1.0+
+- **Pytest**: 7.0+
 
 ## Requirements
 
