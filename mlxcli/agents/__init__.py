@@ -4,6 +4,8 @@ from typing import Optional, Dict, Type
 
 from mlxcli.agents.base_agent import Agent
 from mlxcli.agents.analyzer_agent import AnalyzerAgent
+from mlxcli.agents.debugger_agent import DebuggerAgent
+from mlxcli.agents.researcher_agent import ResearcherAgent
 
 # Agent registry
 AGENTS: Dict[str, Type[Agent]] = {}
@@ -47,10 +49,14 @@ def list_agents() -> list:
 
 # Register built-in agents
 register_agent("analyzer", AnalyzerAgent)
+register_agent("debugger", DebuggerAgent)
+register_agent("researcher", ResearcherAgent)
 
 __all__ = [
     "Agent",
     "AnalyzerAgent",
+    "DebuggerAgent",
+    "ResearcherAgent",
     "AGENTS",
     "register_agent",
     "get_agent",
