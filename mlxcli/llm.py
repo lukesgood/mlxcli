@@ -9,10 +9,14 @@ New code should use: from mlxcli.backends import get_backend
 from typing import Any, Optional
 
 from mlxcli.backends.mlx_backend import MLXBackend as _MLXBackendImpl
+from mlxcli.backends.ollama_backend import OllamaBackend as _OllamaBackendImpl
 from mlxcli.backends import register_backend
 
 # Register the MLX backend in the registry
 register_backend("mlx", _MLXBackendImpl)
+
+# Register the Ollama backend in the registry
+register_backend("ollama", _OllamaBackendImpl)
 
 
 class MLXBackend:
