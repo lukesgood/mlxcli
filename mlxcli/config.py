@@ -58,3 +58,39 @@ class Config:
             value: Value to set.
         """
         self._config[key] = value
+
+    def get_api_key(self, provider: str) -> Optional[str]:
+        """Get API key for a provider (openai, anthropic, etc).
+
+        Looks for API key in environment first using PROVIDER_API_KEY format,
+        then checks configuration file.
+
+        Args:
+            provider: Name of the provider (e.g., "openai", "anthropic").
+
+        Returns:
+            API key string if found, None otherwise.
+        """
+        import os
+
+        # First check environment variable
+        env_var = f"{provider.upper()}_API_KEY"
+        if env_var in os.environ:
+            return os.environ[env_var]
+
+        # Then check config file
+        config_key = f"{provider}_api_key"
+        return self.get(config_key)
+
+    def set_api_key(self, provider: str, api_key: str) -> None:
+        """Store API key for a provider.
+
+        Stores the API key in the configuration dictionary.
+        In a production system, this would securely persist to a config file.
+
+        Args:
+            provider: Name of the provider (e.g., "openai", "anthropic").
+            api_key: API key to store.
+        """
+        config_key = f"{provider}_api_key"
+        self.set(config_key, api_key)
