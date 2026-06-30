@@ -84,22 +84,57 @@ class MLXBackend(LLMBackend):
         if not self._check_mlx():
             return []
 
-        # Placeholder models - will be fetched from HuggingFace in Phase 2
+        # Latest models optimized for MLX on Apple Silicon (4bit quantized)
         models = [
             {
-                "name": "meta-llama/Llama-2-7b-hf",
-                "size": "~7GB",
-                "description": "Llama 2 7B (good for most use cases)",
+                "name": "mlx-community/Llama-3.2-1B-Instruct-4bit",
+                "size": "~0.5GB",
+                "description": "Llama 3.2 1B (fastest, mobile optimized, MLX native)",
             },
             {
-                "name": "mistral-community/Mistral-7B-v0.1",
-                "size": "~7GB",
-                "description": "Mistral 7B (fast, good quality)",
+                "name": "mlx-community/Llama-3.2-3B-Instruct-4bit",
+                "size": "~2GB",
+                "description": "Llama 3.2 3B (fast, good quality, MLX native)",
             },
             {
-                "name": "meta-llama/Llama-2-13b-hf",
-                "size": "~13GB",
-                "description": "Llama 2 13B (larger, higher quality)",
+                "name": "mlx-community/Llama-3.2-11B-Vision-Instruct-4bit",
+                "size": "~6GB",
+                "description": "Llama 3.2 11B Vision (vision + text, MLX optimized)",
+            },
+            {
+                "name": "mlx-community/Gemma-2-9B-4bit",
+                "size": "~5GB",
+                "description": "Gemma 2 9B (Google, efficient, MLX optimized)",
+            },
+            {
+                "name": "mlx-community/Phi-4-4bit",
+                "size": "~8GB",
+                "description": "Phi-4 (Microsoft, powerful compact, MLX 4bit)",
+            },
+            {
+                "name": "mlx-community/Qwen2.5-7B-4bit",
+                "size": "~4GB",
+                "description": "Qwen 2.5 7B (Chinese/English bilingual, MLX optimized)",
+            },
+            {
+                "name": "mlx-community/Qwen2.5-14B-4bit",
+                "size": "~8GB",
+                "description": "Qwen 2.5 14B (Chinese/English, high quality, MLX 4bit)",
+            },
+            {
+                "name": "mlx-community/Mistral-Large-2-4bit",
+                "size": "~30GB",
+                "description": "Mistral Large 2 (powerful reasoning, MLX 4bit)",
+            },
+            {
+                "name": "mlx-community/DeepSeek-V2.5-4bit",
+                "size": "~15GB",
+                "description": "DeepSeek V2.5 (Chinese optimized, strong reasoning, MLX 4bit)",
+            },
+            {
+                "name": "mlx-community/neural-chat-7b-v3-1-4bit",
+                "size": "~4GB",
+                "description": "Neural Chat 7B (conversational, lightweight, MLX native)",
             },
         ]
 
