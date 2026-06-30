@@ -490,15 +490,34 @@ Use @filename syntax to reference files (phase 2 feature).
         # Add user message to session
         self.session.add_message(role="user", content=user_input)
 
-        # In Phase 2, here we would:
-        # 1. Parse file references with _parse_file_references()
-        # 2. Run model inference
-        # 3. Handle tool calls
-        # 4. Format and display response
-        # 5. Add assistant message to session
+        # Run model inference
+        try:
+            print("\n🤖 Thinking...\n")
 
-        # For now, just acknowledge
-        print("[Phase 2: Model inference and response handling]")
+            # Get tool definitions
+            tools = self.registry.list_tools()
+
+            # Generate response from model
+            response = self.backend.generate(
+                prompt=user_input,
+                messages=self.session.messages[:-1] if len(self.session.messages) > 1 else None,
+                tools=tools if tools else None,
+                max_tokens=512
+            )
+
+            # Add assistant response to session
+            self.session.add_message(role="assistant", content=response)
+
+            # Display response
+            print(f"{response}\n")
+
+            # Auto-save session
+            if self.config.get("auto_save", True):
+                self.session.save()
+
+        except Exception as e:
+            print(f"\n✗ Error: {type(e).__name__}")
+            print(f"  {str(e)}\n")
 
     def _parse_file_references(self, text: str) -> list[str]:
         """Parse @file reference syntax from text.

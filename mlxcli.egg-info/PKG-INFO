@@ -24,18 +24,21 @@ Classifier: Topic :: Software Development :: Libraries :: Python Modules
 Classifier: Topic :: Utilities
 Requires-Python: >=3.10
 Description-Content-Type: text/markdown
+License-File: LICENSE
 Requires-Dist: mlx-lm>=0.15.0
 Requires-Dist: pydantic>=2.0
 Requires-Dist: typer>=0.9
 Requires-Dist: rich>=13.0
 Requires-Dist: prompt-toolkit>=3.0
 Requires-Dist: pyyaml>=6.0
+Requires-Dist: requests>=2.28.0
 Provides-Extra: dev
 Requires-Dist: pytest>=7.0; extra == "dev"
 Requires-Dist: pytest-asyncio>=0.21; extra == "dev"
 Requires-Dist: black>=23.0; extra == "dev"
 Requires-Dist: ruff>=0.1.0; extra == "dev"
 Requires-Dist: mypy>=1.0; extra == "dev"
+Dynamic: license-file
 
 # MLX-CLI: Terminal LLM Chat with Local MLX Backend
 
@@ -46,6 +49,7 @@ A terminal-based LLM CLI tool that runs MLX models locally on macOS, inspired by
 
 ## Features
 
+### Core Features
 - **Local LLM Inference**: Run open-source models (Llama, Mistral, etc.) locally using MLX
 - **Interactive Chat**: Real-time conversation with history and session persistence
 - **File Operations**: Read/write files with automatic backups (`.bak` suffixes)
@@ -54,6 +58,14 @@ A terminal-based LLM CLI tool that runs MLX models locally on macOS, inspired by
 - **Session Management**: Save and restore conversations as JSON in `.mlxcli/sessions/`
 - **Cross-platform**: Works on macOS and Linux (OSX-first development)
 - **Type-Safe**: Full Python 3.10+ type hints with pydantic validation
+
+### Phase 3 Features (v1.0)
+- **Multi-Backend Support**: Switch seamlessly between MLX, Ollama, and OpenAI backends
+- **Specialized Agents**: Analyzer (code analysis), Debugger (error diagnosis), Researcher (knowledge gathering)
+- **Advanced Tools**: Web fetch, code execution, extended file operations, shell commands
+- **Workflow Engine**: Multi-step workflow execution with context passing and conditionals
+- **MCP Integration**: Model Context Protocol support for external tool discovery and registration
+- **Agent Chains**: Compose multiple agents for complex reasoning tasks
 
 ## Quick Start
 
@@ -190,23 +202,34 @@ mlx-cli> /load abc12345
 
 ## Architecture
 
+### v1.0 Multi-Layer Architecture
+
 ```
-┌─────────────────────────────┐
-│   CLI Interface Layer       │
-│  (REPL, command parsing)    │
-├─────────────────────────────┤
-│   Session Manager           │
-│  (state, JSON persistence)  │
-├─────────────────────────────┤
-│   Tool Registry             │
-│  (file, shell operations)   │
-├─────────────────────────────┤
-│   LLM Integration (MLX)     │
-│  (model inference)          │
-└─────────────────────────────┘
+┌────────────────────────────────────────────┐
+│        Workflow Engine (Orchestration)     │
+├────────────────────────────────────────────┤
+│   MCP Server    │   Agent Manager          │
+│   (external     │   (Analyzer, Debugger,  │
+│    tools)       │    Researcher)           │
+├────────────────────────────────────────────┤
+│            Multi-Backend Support           │
+│   (MLX | Ollama | OpenAI)                  │
+├────────────────────────────────────────────┤
+│   Tool Registry (Web Fetch, Code Exec)     │
+├────────────────────────────────────────────┤
+│   CLI Interface | Session Manager | Config │
+└────────────────────────────────────────────┘
 ```
 
+### Phase 3 Additions
+- **Agents Layer**: Specialized agents for different reasoning tasks
+- **Workflow Engine**: Multi-step execution with context passing
+- **MCP Integration**: External tool discovery and registration
+- **Multi-Backend**: Seamless switching between different LLM providers
+
 ### Core Modules
+
+**Phase 1-2 (Foundation)**
 
 | Module | Purpose |
 |--------|---------|
@@ -214,9 +237,28 @@ mlx-cli> /load abc12345
 | `session.py` | Conversation state and persistence |
 | `llm.py` | MLX model loading and inference |
 | `tool_registry.py` | Tool registration and dispatch |
+| `tools/base.py` | Tool interface and base classes |
 | `tools/file_tool.py` | File read/write with auto-backup |
 | `tools/shell_tool.py` | Shell command execution |
 | `context.py` | Project context auto-discovery |
+
+**Phase 3 (v1.0)**
+
+| Module | Purpose |
+|--------|---------|
+| `backends/base.py` | Multi-backend abstraction layer |
+| `backends/mlx_backend.py` | MLX backend implementation |
+| `backends/ollama_backend.py` | Ollama backend implementation |
+| `backends/openai_backend.py` | OpenAI backend implementation |
+| `agents/base_agent.py` | Agent interface and base classes |
+| `agents/analyzer_agent.py` | Code analysis specialized agent |
+| `agents/debugger_agent.py` | Error diagnosis specialized agent |
+| `agents/researcher_agent.py` | Knowledge gathering specialized agent |
+| `tools/web_fetch_tool.py` | Web content fetching |
+| `tools/code_execution_tool.py` | Safe code execution |
+| `workflows/workflow_engine.py` | Multi-step workflow execution |
+| `workflows/workflow_parser.py` | YAML/JSON workflow parsing |
+| `mcp/mcp_server.py` | MCP protocol integration |
 
 ## Session Persistence
 
@@ -314,8 +356,8 @@ pytest tests/test_session.py::TestSessionPersistence -v
 The project follows strict code quality standards:
 
 ```bash
-# Format code with black (88 char lines)
-black mlxcli tests
+# Format code with black (100 char lines)
+black mlxcli tests --line-length 100
 
 # Lint and auto-fix issues
 ruff check mlxcli tests --fix
@@ -329,40 +371,69 @@ mypy mlxcli --ignore-missing-imports --python-version 3.10
 ```
 mlxcli/
 ├── mlxcli/
-│   ├── __init__.py           # Package metadata
-│   ├── main.py               # Entry point
-│   ├── cli.py                # REPL interface
-│   ├── session.py            # State management
-│   ├── context.py            # Project context discovery
-│   ├── llm.py                # MLX integration
-│   ├── tool_registry.py      # Tool dispatch system
-│   ├── utils.py              # Utilities and helpers
-│   ├── config.py             # Configuration
-│   └── tools/
-│       ├── base.py           # Tool interface
-│       ├── file_tool.py      # File operations
-│       └── shell_tool.py     # Shell execution
+│   ├── __init__.py                # Package metadata
+│   ├── main.py                    # Entry point
+│   ├── cli.py                     # REPL interface
+│   ├── session.py                 # State management
+│   ├── context.py                 # Project context discovery
+│   ├── tool_registry.py           # Tool dispatch system
+│   ├── utils.py                   # Utilities and helpers
+│   ├── config.py                  # Configuration
+│   ├── backends/                  # Multi-backend support
+│   │   ├── base.py                # Backend abstraction
+│   │   ├── mlx_backend.py         # MLX implementation
+│   │   ├── ollama_backend.py      # Ollama implementation
+│   │   └── openai_backend.py      # OpenAI implementation
+│   ├── agents/                    # Specialized agents
+│   │   ├── base_agent.py          # Agent interface
+│   │   ├── analyzer_agent.py      # Code analysis
+│   │   ├── debugger_agent.py      # Error diagnosis
+│   │   └── researcher_agent.py    # Knowledge gathering
+│   ├── tools/
+│   │   ├── base.py                # Tool interface
+│   │   ├── file_tool.py           # File operations
+│   │   ├── shell_tool.py          # Shell execution
+│   │   ├── web_fetch_tool.py      # Web content
+│   │   └── code_execution_tool.py # Code execution
+│   ├── workflows/                 # Workflow engine
+│   │   ├── workflow_engine.py     # Execution engine
+│   │   └── workflow_parser.py     # YAML/JSON parser
+│   └── mcp/                       # MCP integration
+│       ├── __init__.py            # Package init
+│       └── mcp_server.py          # MCP server
 ├── tests/
-│   ├── test_*.py             # Unit tests (226 tests)
-│   └── test_integration.py   # End-to-end tests (16 tests)
-├── docs/                     # Documentation
-├── pyproject.toml            # Project config
-├── README.md                 # This file
-└── CLAUDE.md                 # Development guide
+│   ├── test_*.py                  # Unit tests (800+ tests)
+│   ├── test_phase3_integration.py # Phase 3 integration (34 tests)
+│   └── test_mcp_server.py         # MCP tests (35 tests)
+├── docs/                          # Documentation
+├── pyproject.toml                 # Project config
+├── README.md                      # This file
+└── CLAUDE.md                      # Development guide
 ```
 
 ### Test Coverage
 
-Current test suite (242 tests):
-- **Unit tests**: 226 tests covering all components
-- **Integration tests**: 16 tests for end-to-end workflows
-- **Areas covered**:
+**v1.0 test suite: 870+ tests**
+
+- **Phase 1**: 242 tests (core components)
+- **Phase 2**: 232 tests (advanced features)
+- **Phase 3**: 104 tests (agents, workflows, MCP)
+
+**Coverage areas**:
   - Session persistence and recovery
   - Tool registry and execution
   - File operations with backups
   - Project context discovery
+  - Shell command execution with safety gates
+  - Error handling and recovery strategies
+  - Model management and switching across backends
+  - Multi-backend support (MLX, Ollama, OpenAI)
+  - Specialized agents (Analyzer, Debugger, Researcher)
+  - Workflow engine with multi-step execution
+  - MCP tool discovery and registration
+  - Agent chaining and composition
   - Complex multi-operation workflows
-  - Error handling and edge cases
+  - Full end-to-end scenarios
 
 ### Version Requirements
 
@@ -378,28 +449,122 @@ Current test suite (242 tests):
 - **MLX**: Compatible with macOS 13+
 - **Dependencies**: See `pyproject.toml`
 
+## Advanced Features (v0.2)
+
+### Shell Command Execution
+Execute shell commands with auto-confirmation for dangerous operations:
+
+```bash
+mlx-cli> ! ls -la
+mlx-cli> ! python script.py
+
+# Dangerous commands require explicit confirmation:
+mlx-cli> ! rm -rf /tmp
+⚠️  Potentially dangerous command: rm -rf /tmp
+Set confirmed=True to override
+```
+
+### Enhanced Model Management
+Switch between models within the same session:
+
+```bash
+mlx-cli> /model list
+📦 Available Models:
+  1. meta-llama/Llama-2-7b-hf
+     Llama 2 7B (good for most use cases)
+     Size: ~7GB
+
+mlx-cli> /model switch meta-llama/Llama-2-13b-hf
+✓ Switched to meta-llama/Llama-2-13b-hf
+```
+
+### Improved Session Management
+Better session organization and info:
+
+```bash
+mlx-cli> /sessions
+📋 Saved Sessions:
+
+  1. session_abc123
+     Model: meta-llama/Llama-2-7b-hf
+     Messages: 12
+     Last: "How does machine learning work? ..."
+     Updated: 2026-06-30T15:45:00
+
+mlx-cli> /delete session_abc123
+```
+
+### Command Auto-Completion
+Tab completion for commands, files, and models:
+
+```bash
+mlx-cli> /mod[TAB]
+/model           /model list      /model switch
+
+mlx-cli> @REA[TAB]
+@README.md       @README.txt
+
+History: Ctrl+R for command history search
+```
+
+### Context-Aware Conversations
+Automatic trimming of long conversation history:
+- Keeps most recent messages within token budget
+- Preserves conversation coherence
+- Prevents token limit errors
+
+### Error Recovery
+Graceful handling of common errors:
+- Model not found → Download suggestions
+- Out of memory → Model switching options
+- Corrupted sessions → Automatic recovery
+- Command timeouts → Simplified suggestions
+
+## Development Guide
+
+### Running Tests
+```bash
+# Run all tests
+pytest -v
+
+# Run specific test
+pytest tests/test_error_scenarios.py -v
+
+# Run with coverage
+pytest --cov=mlxcli
+```
+
+### Code Quality
+```bash
+# Format code (100 char lines)
+black mlxcli tests --line-length 100
+
+# Lint code
+ruff check mlxcli tests --fix
+
+# Type check
+mypy mlxcli --ignore-missing-imports --python-version 3.10
+```
+
+### Architecture
+See CLAUDE.md for detailed component documentation and Phase 2 additions.
+
 ## Roadmap
 
-### Phase 1 (v0.1) - Core
-- [x] Design complete
-- [ ] CLI REPL setup
-- [ ] Session management
-- [ ] File operations with backup
-- [ ] MLX integration
-- [ ] Project context discovery
+### Phase 2 (v0.2) - Polish ✓
+- [x] ShellTool with safety gates
+- [x] Comprehensive error handling
+- [x] Enhanced model and session management
+- [x] Auto-completion support
+- [x] Token-aware context management
 
-### Phase 2 (v0.2) - Polish
-- [ ] Shell tool with safety guards
-- [ ] Session switching UI
-- [ ] Model management
-- [ ] Command auto-completion
-
-### Phase 3 (v1.0) - Extensions
-- [ ] Web fetching tool
-- [ ] Code execution sandbox
-- [ ] Plugin system (MCP)
-- [ ] Multi-backend support
-- [ ] Specialized agents
+### Phase 3 (v1.0) - Extension (Planned)
+- WebFetch tool for web research
+- Code execution tool (sandboxed)
+- MCP (Model Context Protocol) support
+- Multi-backend support (Ollama, OpenAI)
+- Specialized agents (analyzer, debugger, researcher)
+- Custom workflow definitions
 
 ## License
 
