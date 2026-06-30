@@ -1,40 +1,52 @@
 # MLX-CLI Development Guide
 
-**Last Updated**: 2026-06-29  
-**Status**: Design Phase Complete, Implementation Underway  
+**Last Updated**: 2026-06-30  
+**Status**: v1.0 Complete - Phase 3 Implementation Done  
 **Language**: Python 3.10+  
+**Test Coverage**: 870+ tests passing
 
 ## Table of Contents
 
 1. [Architecture Overview](#architecture-overview)
-2. [Project Structure](#project-structure)
-3. [Development Setup](#development-setup)
-4. [Core Modules](#core-modules)
-5. [Testing Strategy](#testing-strategy)
-6. [Session Management](#session-management)
-7. [Tool System](#tool-system)
-8. [MLX Integration](#mlx-integration)
-9. [Error Handling](#error-handling)
-10. [Contributing Guidelines](#contributing-guidelines)
+2. [Phase 3 Features](#phase-3-features)
+3. [Project Structure](#project-structure)
+4. [Development Setup](#development-setup)
+5. [Core Modules](#core-modules)
+6. [Testing Strategy](#testing-strategy)
+7. [Session Management](#session-management)
+8. [Tool System](#tool-system)
+9. [Agent System](#agent-system)
+10. [Workflow Engine](#workflow-engine)
+11. [MCP Integration](#mcp-integration)
+12. [Error Handling](#error-handling)
+13. [Contributing Guidelines](#contributing-guidelines)
 
 ---
 
 ## Architecture Overview
 
-### System Design
-
-MLX-CLI follows a layered architecture:
+### v1.0 System Design (Multi-Layer)
 
 ```
-┌─────────────────────────────┐
-│   CLI Interface Layer       │  User interaction (REPL, commands)
-├─────────────────────────────┤
-│   Session Manager           │  State persistence & recovery
-├─────────────────────────────┤
-│   Tool Registry             │  Plugin-like tool dispatch
-├─────────────────────────────┤
-│   LLM Integration (MLX)     │  Model inference & token management
-└─────────────────────────────┘
+┌────────────────────────────────────────────┐
+│        Workflow Engine (Orchestration)     │
+│   - Multi-step workflow execution          │
+│   - Context passing between steps          │
+│   - Conditional execution support          │
+├────────────────────────────────────────────┤
+│  Agent System       │    MCP Server         │
+│  - Analyzer         │  - External tools     │
+│  - Debugger         │  - Tool discovery     │
+│  - Researcher       │  - Registration       │
+├────────────────────────────────────────────┤
+│    Multi-Backend Support                   │
+│  (MLX | Ollama | OpenAI)                   │
+├────────────────────────────────────────────┤
+│   Tool Registry (extensible tool system)   │
+├────────────────────────────────────────────┤
+│  Session Manager  │  CLI Interface         │
+│  Config Manager   │  Project Context       │
+└────────────────────────────────────────────┘
 ```
 
 ### Design Decisions
@@ -46,6 +58,42 @@ MLX-CLI follows a layered architecture:
 | **Plugin Tools** | Extensibility without core changes |
 | **Pydantic Validation** | Type-safe data handling, automatic validation |
 | **Async Support** | Ready for concurrent operations (Phase 2) |
+| **Multi-Backend** | Support MLX, Ollama, OpenAI with unified interface |
+| **Agent Specialization** | Separate agents for different reasoning tasks |
+| **MCP Protocol** | Standard for external tool integration |
+
+---
+
+## Phase 3 Features
+
+### 1. Multi-Backend Support
+- **Backends**: MLX (local), Ollama (local/remote), OpenAI (cloud)
+- **Switch Runtime**: Change backends without code changes
+- **Unified Interface**: All backends implement same API
+- **Model Discovery**: Each backend reports available models
+
+### 2. Specialized Agents
+- **Analyzer**: Code analysis, functionality explanation, improvements
+- **Debugger**: Error diagnosis, root cause analysis, solutions
+- **Researcher**: Knowledge gathering, information synthesis, learning
+
+### 3. Workflow Engine
+- **Multi-Step Execution**: Chain multiple operations
+- **Context Passing**: Share data between workflow steps
+- **Conditional Execution**: Branch on step results
+- **YAML/JSON Support**: Define workflows in configuration files
+
+### 4. MCP Integration
+- **Tool Discovery**: Find available external tools
+- **Tool Registration**: Register MCP tools dynamically
+- **Automatic Wrapping**: Convert MCP tools to Tool interface
+- **Registry Integration**: MCP tools available alongside standard tools
+
+### 5. Advanced Tools
+- **WebFetchTool**: Fetch and parse web content
+- **CodeExecutionTool**: Safe execution of code snippets
+- **Extended FileTool**: Advanced file operations
+- **ShellTool**: Enhanced shell command execution
 
 ---
 
@@ -775,6 +823,149 @@ New commands and better UX:
 
 ---
 
+## Agent System
+
+### Architecture
+
+Agents are specialized reasoning components that handle specific tasks:
+
+```python
+class Agent(ABC):
+    @property
+    def name(self) -> str: ...
+    
+    @property
+    def description(self) -> str: ...
+    
+    def execute(self, task: str, context: dict) -> dict:
+        """Execute agent-specific reasoning."""
+        pass
+```
+
+### Available Agents
+
+| Agent | Purpose | Use Case |
+|-------|---------|----------|
+| **Analyzer** | Code analysis & explanation | Understand code structure and functionality |
+| **Debugger** | Error diagnosis & troubleshooting | Find and fix bugs |
+| **Researcher** | Information gathering & synthesis | Learn about topics and concepts |
+
+### Agent Chaining
+
+Agents can be chained by passing results through context:
+
+```python
+# Research findings → Analysis → Debugging
+research_result = researcher.execute("topic", context)
+analysis_result = analyzer.execute(research_result["result"], context)
+debug_result = debugger.execute(analysis_result["result"], context)
+```
+
+---
+
+## Workflow Engine
+
+### Architecture
+
+The workflow engine coordinates multi-step operations:
+
+```python
+class WorkflowEngine:
+    def __init__(self, backend, agents, tools):
+        """Initialize with backend, agents, and tools."""
+        pass
+    
+    async def execute(self, workflow: dict, context: dict = None) -> dict:
+        """Execute workflow steps with context passing."""
+        pass
+```
+
+### Workflow Definition
+
+Workflows are defined in YAML or JSON:
+
+```yaml
+name: code_review_workflow
+steps:
+  - id: fetch_code
+    action: tool
+    tool: file_reader
+    args:
+      path: "{{ input.file_path }}"
+  
+  - id: analyze
+    action: agent
+    agent: analyzer
+    args:
+      code: "{{ steps.fetch_code.output }}"
+  
+  - id: suggest_improvements
+    action: agent
+    agent: debugger
+    args:
+      code: "{{ steps.fetch_code.output }}"
+    depends_on: [analyze]
+```
+
+### Features
+- Sequential step execution
+- Context passing between steps
+- Conditional step execution
+- Dependency management
+- Error recovery and rollback
+
+---
+
+## MCP Integration
+
+### Model Context Protocol
+
+MCP enables integration of external tools through a standard protocol:
+
+```python
+class MCPServer:
+    def register_mcp_tool(self, name: str, description: str, 
+                         execute_fn: Callable) -> bool:
+        """Register MCP tool."""
+        pass
+    
+    def discover_tools(self) -> list[str]:
+        """Discover available MCP tools."""
+        pass
+    
+    def execute_tool(self, name: str, args: dict) -> dict:
+        """Execute MCP tool."""
+        pass
+```
+
+### Integration Points
+
+1. **Tool Discovery**: Identify available external tools
+2. **Tool Registration**: Add MCP tools to registry
+3. **Tool Execution**: Execute MCP tools through unified interface
+4. **Agent Access**: MCP tools available in agent context
+
+### Example
+
+```python
+# Create MCP server
+mcp = MCPServer(tool_registry)
+
+# Register external tool
+def fetch_api_data(args):
+    url = args.get("url")
+    # Fetch and return data
+    return {"status": "ok", "data": {...}}
+
+mcp.register_mcp_tool("fetch_api", "Fetch API data", fetch_api_data)
+
+# Use in agents
+context = {"tools": tool_registry}  # MCP tools auto-included
+agent.execute("task", context)  # Can use fetch_api tool
+```
+
+---
+
 ## Troubleshooting
 
 ### Common Issues
@@ -793,6 +984,7 @@ A: Ensure `tests/` has `__init__.py` if needed (usually not)
 
 ---
 
-**Last updated**: 2026-06-29  
+**Last updated**: 2026-06-30  
 **Maintainers**: MLX CLI Contributors  
-**Status**: Implementation in progress
+**Status**: v1.0 Complete - Ready for Release  
+**Test Coverage**: 870+ tests passing (Phase 1, 2, and 3)
